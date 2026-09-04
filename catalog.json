@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "language": "python",
+  "count": 10,
+  "smells": [
+    {
+      "id": "assert-for-runtime-validation",
+      "signature": "An assert statement is used to validate caller input or external data.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "control-flow",
+      "tags": [
+        "validation",
+        "invariants"
+      ],
+      "keywords": [
+        "assert",
+        "assert not",
+        "-O",
+        "AssertionError"
+      ]
+    },
+    {
+      "id": "bare-except-pass",
+      "signature": "An except clause with no type and an empty body discards every error silently.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "exceptions",
+      "tags": [
+        "error-handling",
+        "silent-failure"
+      ],
+      "keywords": [
+        "except:",
+        "except Exception",
+        "pass",
+        "try"
+      ]
+    },
+    {
+      "id": "boolean-parameter-selects-behaviour",
+      "signature": "A boolean parameter picks between two behaviours, so the call site reads as a bare True or False.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "functions",
+      "tags": [
+        "api-design",
+        "parameters"
+      ],
+      "keywords": [
+        "True)",
+        "False)",
+        "if flag:",
+        "as_csv",
+        "def export"
+      ]
+    },
+    {
+      "id": "mutable-default-argument",
+      "signature": "A function default is a list or dict, so one object is shared across every call.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "defaults",
+        "shared-state"
+      ],
+      "keywords": [
+        "=[]",
+        "={}",
+        "def",
+        "default argument",
+        "append"
+      ]
+    },
+    {
+      "id": "naive-datetime-for-instants",
+      "signature": "A moment in time is recorded with datetime.now() and no timezone, producing a naive local timestamp.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "stdlib-misuse",
+      "tags": [
+        "datetime",
+        "timezones",
+        "comparison"
+      ],
+      "keywords": [
+        "datetime.now()",
+        "utcnow()",
+        "datetime.today()",
+        "last_seen"
+      ]
+    },
+    {
+      "id": "name-lies-about-the-type",
+      "signature": "An identifier carries a type suffix that the value does not actually have.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "naming",
+      "tags": [
+        "naming",
+        "types"
+      ],
+      "keywords": [
+        "_list",
+        "_dict",
+        "_str",
+        "_array",
+        ".items()"
+      ]
+    },
+    {
+      "id": "sleep-to-await-a-condition",
+      "signature": "A fixed sleep stands in for waiting on a condition to become true.",
+      "severity": "trap",
+      "category": "testability",
+      "topic": "concurrency",
+      "tags": [
+        "flaky",
+        "timing",
+        "synchronisation"
+      ],
+      "keywords": [
+        "time.sleep",
+        "sleep(",
+        "asyncio.sleep",
+        "await asyncio.sleep"
+      ]
+    },
+    {
+      "id": "sql-built-by-string-concatenation",
+      "signature": "A SQL statement is assembled by concatenating or interpolating values into the query text.",
+      "severity": "bug",
+      "category": "security",
+      "topic": "strings",
+      "tags": [
+        "sql",
+        "injection",
+        "database"
+      ],
+      "keywords": [
+        "execute",
+        "SELECT",
+        "WHERE",
+        "+ email",
+        "f\"SELECT",
+        "% (",
+        ".format("
+      ]
+    },
+    {
+      "id": "string-concatenation-in-a-loop",
+      "signature": "A string is accumulated with += inside a loop instead of being joined at the end.",
+      "severity": "taste",
+      "category": "performance",
+      "topic": "strings",
+      "tags": [
+        "accumulation",
+        "join"
+      ],
+      "keywords": [
+        "+=",
+        "out = \"\"",
+        "result = ''",
+        "for row in"
+      ]
+    },
+    {
+      "id": "wildcard-import",
+      "signature": "A module is imported with a wildcard, dumping unknown names into the local namespace.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "imports",
+      "tags": [
+        "namespace",
+        "shadowing"
+      ],
+      "keywords": [
+        "import *",
+        "from os.path import *",
+        "__all__"
+      ]
+    }
+  ]
+}

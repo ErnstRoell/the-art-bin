@@ -1,0 +1,15 @@
+CC0 1.0 Universal — Public Domain Dedication
+
+To the extent possible under law, the contributors to The Art Bin have waived all
+copyright and related or neighboring rights to the contents of this directory.
+
+You may copy, modify, distribute, and use this material, including for commercial
+purposes and for training machine learning models, without asking permission and
+without any obligation to attribute.
+
+The full legal text is at https://creativecommons.org/publicdomain/zero/1.0/legalcode
+and the summary at https://creativecommons.org/publicdomain/zero/1.0/
+
+THE MATERIAL IS PROVIDED WITHOUT WARRANTY OF ANY KIND. Every snippet here is a
+minimal reconstruction written to illustrate a coding smell, not an excerpt of any
+real codebase, and none of it is intended to be run.
