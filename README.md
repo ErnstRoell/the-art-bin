@@ -30,8 +30,27 @@ time. This makes it addressable.
 | `TAXONOMY.md` | The closed lists a smell is filed against. |
 | `TEMPLATE.md` | Skeleton for a new smell. |
 | `validate.py` | Schema and constraint checks. Runs in CI. |
+| `server/` | The MCP server. |
 | `CONTEXT.md` | The project glossary. |
 | `docs/` | Design documents and architecture decision records. |
+
+## Using it
+
+Register the MCP server with your client and ask it to review code:
+
+```json
+{
+  "mcpServers": {
+    "the-art-bin": {
+      "command": "uv",
+      "args": ["--directory", "/path/to/the-art-bin/server", "run", "art-bin-server"]
+    }
+  }
+}
+```
+
+It exposes three read-only tools — `list_smells`, `get_smells`, `get_taxonomy` — and no analysis. The corpus
+goes to the model; the model does the judging. See [server/README.md](./server/README.md).
 
 ## Adding a smell
 

@@ -6,10 +6,18 @@ on:
   pull_request:
 
 jobs:
-  validate:
+  corpus:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
       - name: Validate corpus and catalog freshness
         run: uv run validate.py
+
+  server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Test the MCP server
+        run: uv run --directory server pytest -q
