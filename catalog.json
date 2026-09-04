@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "language": "python",
-  "count": 60,
+  "count": 61,
   "smells": [
     {
       "id": "abbreviated-identifier",
@@ -285,6 +285,26 @@
         "logger.error(f",
         "%s",
         "{loss:.4f}"
+      ]
+    },
+    {
+      "id": "equality-chain-instead-of-lookup-table",
+      "signature": "A chain of if/elif branches tests one variable for equality against constants and assigns to a single target, so the mapping cannot be read, extended, or iterated.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "control-flow",
+      "tags": [
+        "dispatch",
+        "lookup-table",
+        "open-closed"
+      ],
+      "keywords": [
+        "= None",
+        "elif name ==",
+        "elif fmt ==",
+        "elif clf_name ==",
+        "data = None",
+        "else:"
       ]
     },
     {
