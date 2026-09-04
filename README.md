@@ -1,7 +1,7 @@
 # The art bin
 
-Your place to share your special snowflakes, pet peeves and other works of art
-so your LLM can learn what not to do.
+The place to share your special snowflakes, pet peeves and other works of art. 
+All so your LLM can learn what not to do and for you to have a good laugh.
 
 ```python
 this_is_true = False
