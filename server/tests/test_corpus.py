@@ -76,10 +76,18 @@ def test_ids_are_not_treated_as_paths(corpus: Corpus, hostile: str) -> None:
 
 
 def test_filters_narrow_the_catalog(corpus: Corpus) -> None:
-    assert corpus.list_smells(severity=["taste"])["count"] == 3
-    assert corpus.list_smells(category=["security"])["count"] == 1
-    assert corpus.list_smells(severity=["bug"], category=["security"])["count"] == 1
-    assert corpus.list_smells(severity=["taste"], category=["security"])["count"] == 0
+    """Counts are derived from the catalog, not hardcoded, so the corpus can grow."""
+    smells = corpus.catalog()["smells"]
+    taste = {smell["id"] for smell in smells if smell["severity"] == "taste"}
+    security = {smell["id"] for smell in smells if smell["category"] == "security"}
+
+    assert 0 < len(taste) < len(smells)
+    assert 0 < len(security) < len(smells)
+    assert corpus.list_smells(severity=["taste"])["count"] == len(taste)
+    assert corpus.list_smells(category=["security"])["count"] == len(security)
+    assert corpus.list_smells(severity=["taste"], category=["security"])["count"] == len(
+        taste & security
+    )
     assert corpus.list_smells(language="ruby")["count"] == 0
 
 

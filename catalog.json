@@ -1,8 +1,107 @@
 {
   "schema_version": 1,
   "language": "python",
-  "count": 10,
+  "count": 60,
   "smells": [
+    {
+      "id": "abbreviated-identifier",
+      "signature": "Identifiers are clipped to abbreviations such as cfg, res, or val, so the reader has to decode them.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "naming",
+      "tags": [
+        "naming",
+        "abbreviations",
+        "house-style"
+      ],
+      "keywords": [
+        "cfg",
+        "res =",
+        "tmp",
+        "val =",
+        "idx",
+        "num_",
+        "ret ="
+      ]
+    },
+    {
+      "id": "any-annotation-as-placeholder",
+      "signature": "Parameters are annotated Any where the concrete type is known, so the checker verifies nothing.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "typing",
+      "tags": [
+        "annotations",
+        "type-checking",
+        "documentation"
+      ],
+      "keywords": [
+        ": Any",
+        "-> Any",
+        "from typing import Any",
+        "Dict[str, Any]"
+      ]
+    },
+    {
+      "id": "argument-mutated-in-place",
+      "signature": "A function rewrites the container it was passed and also returns it, so callers cannot tell the argument was consumed.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "side-effects",
+        "aliasing",
+        "api-design"
+      ],
+      "keywords": [
+        "def",
+        "[index] =",
+        ".append(",
+        "return rows",
+        "enumerate"
+      ]
+    },
+    {
+      "id": "array-concatenated-in-a-loop",
+      "signature": "An array or tensor grows by concatenation inside a loop, so every step reallocates and copies everything accumulated so far.",
+      "severity": "taste",
+      "category": "performance",
+      "topic": "numerics",
+      "tags": [
+        "numpy",
+        "pytorch",
+        "allocation",
+        "accumulation"
+      ],
+      "keywords": [
+        "torch.cat",
+        "np.concatenate",
+        "np.append",
+        "torch.empty(0",
+        "out = torch.cat"
+      ]
+    },
+    {
+      "id": "array-view-mutated-as-if-copy",
+      "signature": "A slice of an array is modified in place, so the write reaches the original array through the view.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "numerics",
+      "tags": [
+        "numpy",
+        "aliasing",
+        "views",
+        "in-place"
+      ],
+      "keywords": [
+        "[:count]",
+        "-=",
+        "+=",
+        ".copy()",
+        "signal[",
+        "np.ndarray"
+      ]
+    },
     {
       "id": "assert-for-runtime-validation",
       "signature": "An assert statement is used to validate caller input or external data.",
@@ -38,6 +137,25 @@
       ]
     },
     {
+      "id": "blocking-call-in-async-function",
+      "signature": "An async function calls a blocking library or time.sleep, so the event loop stops until that call returns.",
+      "severity": "trap",
+      "category": "performance",
+      "topic": "concurrency",
+      "tags": [
+        "asyncio",
+        "event-loop",
+        "blocking"
+      ],
+      "keywords": [
+        "async def",
+        "requests.get",
+        "time.sleep",
+        "await",
+        "run_in_executor"
+      ]
+    },
+    {
       "id": "boolean-parameter-selects-behaviour",
       "signature": "A boolean parameter picks between two behaviours, so the call site reads as a bare True or False.",
       "severity": "taste",
@@ -53,6 +171,442 @@
         "if flag:",
         "as_csv",
         "def export"
+      ]
+    },
+    {
+      "id": "broad-except-before-specific",
+      "signature": "A broad except clause is listed before a narrower one, so the narrower handler can never run.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "exceptions",
+      "tags": [
+        "error-handling",
+        "dead-code",
+        "ordering"
+      ],
+      "keywords": [
+        "except Exception:",
+        "except ValueError:",
+        "try:",
+        "except OSError"
+      ]
+    },
+    {
+      "id": "broad-exception-asserted-in-test",
+      "signature": "A test asserts that Exception is raised, so any failure inside the block satisfies it including a mistake in the test.",
+      "severity": "trap",
+      "category": "testability",
+      "topic": "stdlib-misuse",
+      "tags": [
+        "tests",
+        "assertions",
+        "false-confidence"
+      ],
+      "keywords": [
+        "pytest.raises(Exception)",
+        "assertRaises(Exception)",
+        "with pytest.raises",
+        "match="
+      ]
+    },
+    {
+      "id": "builtin-name-shadowed",
+      "signature": "A local or module name reuses a builtin such as list, dict, or id, so the builtin is unreachable in that scope.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "naming",
+      "tags": [
+        "shadowing",
+        "scope",
+        "builtins"
+      ],
+      "keywords": [
+        "list =",
+        "dict =",
+        "id =",
+        "type =",
+        "input =",
+        "str ="
+      ]
+    },
+    {
+      "id": "constructor-does-io",
+      "signature": "A constructor reads files or opens connections, so the object cannot be created without its environment.",
+      "severity": "trap",
+      "category": "testability",
+      "topic": "classes",
+      "tags": [
+        "construction",
+        "side-effects",
+        "dependencies"
+      ],
+      "keywords": [
+        "def __init__",
+        "open(",
+        ".read_text()",
+        "torch.load",
+        "requests.get",
+        ".glob("
+      ]
+    },
+    {
+      "id": "dict-get-with-mutable-fallback",
+      "signature": "A value is appended to the fallback object returned by dict.get, so the new item is dropped instead of stored.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "stdlib-misuse",
+      "tags": [
+        "dictionaries",
+        "defaults",
+        "grouping"
+      ],
+      "keywords": [
+        ".get(key, [])",
+        ".get(",
+        ").append(",
+        "setdefault",
+        "defaultdict"
+      ]
+    },
+    {
+      "id": "eager-f-string-in-log-call",
+      "signature": "A log call formats an f-string argument, so the message is built even when that level is switched off.",
+      "severity": "taste",
+      "category": "performance",
+      "topic": "strings",
+      "tags": [
+        "logging",
+        "formatting",
+        "hot-path"
+      ],
+      "keywords": [
+        "logger.debug(f",
+        "logging.info(f",
+        "logger.error(f",
+        "%s",
+        "{loss:.4f}"
+      ]
+    },
+    {
+      "id": "exception-logged-as-string",
+      "signature": "An except block logs the exception as a string, so its type and traceback never reach the log.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "exceptions",
+      "tags": [
+        "logging",
+        "tracebacks",
+        "diagnosability"
+      ],
+      "keywords": [
+        "str(exc)",
+        "str(e)",
+        "logger.error",
+        "except",
+        "{e}"
+      ]
+    },
+    {
+      "id": "float-equality-comparison",
+      "signature": "Two floating point values are compared for exact equality, so representation error decides the answer.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "numerics",
+      "tags": [
+        "floating-point",
+        "comparison",
+        "tolerance"
+      ],
+      "keywords": [
+        "== 1.0",
+        "== 0.1",
+        "!= 0.0",
+        "math.isclose",
+        "np.allclose",
+        "sum("
+      ]
+    },
+    {
+      "id": "function-call-as-default-argument",
+      "signature": "A default argument is a function call, so it is evaluated once at definition time and frozen for the life of the process.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "functions",
+      "tags": [
+        "defaults",
+        "import-time",
+        "datetime"
+      ],
+      "keywords": [
+        "=datetime.now()",
+        "=[]",
+        "=dict()",
+        "def ",
+        "=time.time()"
+      ]
+    },
+    {
+      "id": "generator-consumed-twice",
+      "signature": "A generator is iterated a second time after being exhausted, so the second pass sees nothing.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "control-flow",
+      "tags": [
+        "generators",
+        "iterators",
+        "exhaustion"
+      ],
+      "keywords": [
+        "(row for row in",
+        "map(",
+        "filter(",
+        "sum(",
+        "max(",
+        "zip("
+      ]
+    },
+    {
+      "id": "getter-setter-wrapping-plain-attribute",
+      "signature": "A class exposes get and set methods that do nothing but read and write one plain attribute.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "classes",
+      "tags": [
+        "api-design",
+        "properties",
+        "ceremony"
+      ],
+      "keywords": [
+        "def get_",
+        "def set_",
+        "self._name",
+        "return self._",
+        "def get_name"
+      ]
+    },
+    {
+      "id": "global-statement-for-shared-state",
+      "signature": "A function uses the global statement to cache or share state, so its result depends on what ran before it.",
+      "severity": "trap",
+      "category": "testability",
+      "topic": "mutability",
+      "tags": [
+        "global-state",
+        "caching",
+        "hidden-dependencies"
+      ],
+      "keywords": [
+        "global ",
+        "_CACHE",
+        "is None:",
+        "_MODEL",
+        "= None"
+      ]
+    },
+    {
+      "id": "hardcoded-cuda-device",
+      "signature": "Code names cuda directly instead of taking a device, so it cannot run on cpu or on a chosen gpu.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "numerics",
+      "tags": [
+        "pytorch",
+        "devices",
+        "portability"
+      ],
+      "keywords": [
+        ".cuda()",
+        "device=\"cuda\"",
+        "cuda:0",
+        "torch.device",
+        ".to(device)"
+      ]
+    },
+    {
+      "id": "isinstance-chain-instead-of-dispatch",
+      "signature": "A chain of isinstance branches switches on the type of an object the module owns, so adding a type means editing this function.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "polymorphism",
+        "dispatch",
+        "open-closed"
+      ],
+      "keywords": [
+        "isinstance(",
+        "elif isinstance",
+        "raise TypeError",
+        "if isinstance(shape"
+      ]
+    },
+    {
+      "id": "kwargs-forwarded-through-layers",
+      "signature": "A function accepts kwargs only to forward them to another function, so no layer states what it accepts.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "functions",
+      "tags": [
+        "signatures",
+        "api-design",
+        "indirection"
+      ],
+      "keywords": [
+        "**kwargs",
+        "**config",
+        "def train(**",
+        "(**kwargs)"
+      ]
+    },
+    {
+      "id": "lambda-bound-to-a-name",
+      "signature": "A lambda is assigned to a name, so the resulting function has no qualified name and cannot carry a docstring.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "functions",
+      "tags": [
+        "lambda",
+        "tracebacks",
+        "docstrings"
+      ],
+      "keywords": [
+        "= lambda",
+        "= lambda x:",
+        "normalise = lambda"
+      ]
+    },
+    {
+      "id": "late-binding-closure-in-loop",
+      "signature": "A function defined in a loop closes over the loop variable, so every closure sees the final value.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "functions",
+      "tags": [
+        "closures",
+        "loops",
+        "scope"
+      ],
+      "keywords": [
+        "lambda",
+        "for factor in",
+        ".append(lambda",
+        "def inner",
+        "functools.partial"
+      ]
+    },
+    {
+      "id": "length-checked-instead-of-truthiness",
+      "signature": "Emptiness is tested by comparing len against zero rather than by the object's own truthiness.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "control-flow",
+      "tags": [
+        "conditionals",
+        "truthiness",
+        "emptiness"
+      ],
+      "keywords": [
+        "len(",
+        "> 0",
+        "== 0",
+        "if len(rows)",
+        "!= 0"
+      ]
+    },
+    {
+      "id": "list-mutated-while-iterating",
+      "signature": "Items are removed from a list while a for loop iterates it, so the cursor skips elements.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "loops",
+        "aliasing",
+        "skipped-elements"
+      ],
+      "keywords": [
+        ".remove(",
+        "del ",
+        "for row in rows",
+        ".pop(",
+        "for item in items"
+      ]
+    },
+    {
+      "id": "lru-cache-on-instance-method",
+      "signature": "An lru_cache decorates a method, so the cache holds self as part of every key and keeps each instance alive for the life of the process.",
+      "severity": "trap",
+      "category": "performance",
+      "topic": "stdlib-misuse",
+      "tags": [
+        "caching",
+        "memory",
+        "lifetimes"
+      ],
+      "keywords": [
+        "@functools.lru_cache",
+        "@lru_cache",
+        "@cache",
+        "def read(self",
+        "cached_property"
+      ]
+    },
+    {
+      "id": "model-evaluated-in-train-mode",
+      "signature": "A model is run for evaluation without eval mode or no_grad, so dropout stays active and batch statistics keep updating.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "numerics",
+      "tags": [
+        "pytorch",
+        "dropout",
+        "batchnorm",
+        "evaluation"
+      ],
+      "keywords": [
+        "model.eval()",
+        "model.train()",
+        "torch.no_grad",
+        "with torch.inference_mode",
+        "def accuracy"
+      ]
+    },
+    {
+      "id": "module-level-side-effect-on-import",
+      "signature": "Importing the module seeds a generator, selects a device, or configures logging as a side effect.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "imports",
+      "tags": [
+        "import-time",
+        "global-state",
+        "configuration"
+      ],
+      "keywords": [
+        "torch.manual_seed",
+        "logging.basicConfig",
+        "np.random.seed",
+        "DEVICE =",
+        "warnings.filterwarnings"
+      ]
+    },
+    {
+      "id": "mutable-class-attribute",
+      "signature": "A list or dict is assigned in the class body, so every instance shares one object.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "shared-state",
+        "classes",
+        "defaults"
+      ],
+      "keywords": [
+        "= []",
+        "= {}",
+        "class",
+        "self.items.append",
+        "cls."
       ]
     },
     {
@@ -107,6 +661,216 @@
         "_str",
         "_array",
         ".items()"
+      ]
+    },
+    {
+      "id": "open-without-encoding",
+      "signature": "A text file is opened without an explicit encoding, so the platform default decides how its bytes are decoded.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "io",
+      "tags": [
+        "encoding",
+        "files",
+        "portability"
+      ],
+      "keywords": [
+        "open(",
+        "open(path)",
+        "\"r\")",
+        ".read_text()",
+        "encoding="
+      ]
+    },
+    {
+      "id": "optional-dependency-import-swallowed",
+      "signature": "An optional import is wrapped in try and except ImportError with no fallback, so the name is simply absent later.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "imports",
+      "tags": [
+        "optional-dependencies",
+        "silent-failure",
+        "error-messages"
+      ],
+      "keywords": [
+        "except ImportError",
+        "try:",
+        "import matplotlib",
+        "pass",
+        "NameError"
+      ]
+    },
+    {
+      "id": "path-built-by-string-concatenation",
+      "signature": "A filesystem path is assembled by concatenating strings with separators written by hand.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "io",
+      "tags": [
+        "paths",
+        "pathlib",
+        "portability"
+      ],
+      "keywords": [
+        "+ \"/\"",
+        "run_dir +",
+        "os.path.join",
+        "+ \".pt\"",
+        "f\"{root}/{name}\""
+      ]
+    },
+    {
+      "id": "pickle-loaded-from-untrusted-file",
+      "signature": "A pickle stream is deserialised from a file the program did not produce, so loading it executes arbitrary code.",
+      "severity": "bug",
+      "category": "security",
+      "topic": "io",
+      "tags": [
+        "deserialisation",
+        "checkpoints",
+        "remote-code-execution"
+      ],
+      "keywords": [
+        "pickle.load",
+        "pickle.loads",
+        "torch.load",
+        "joblib.load",
+        "allow_pickle=True",
+        "weights_only"
+      ]
+    },
+    {
+      "id": "print-used-as-logging",
+      "signature": "A library or long-running job reports progress with print, so the output carries no level, timestamp, or destination.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "io",
+      "tags": [
+        "logging",
+        "observability",
+        "output"
+      ],
+      "keywords": [
+        "print(",
+        "print(\"step\"",
+        "print(f",
+        "flush=True"
+      ]
+    },
+    {
+      "id": "raise-without-from-in-except",
+      "signature": "An exception is raised inside an except block without from, so the traceback reads as a failure in the handler itself.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "exceptions",
+      "tags": [
+        "error-handling",
+        "tracebacks",
+        "chaining"
+      ],
+      "keywords": [
+        "except",
+        "raise",
+        "from exc",
+        "as exc",
+        "During handling"
+      ]
+    },
+    {
+      "id": "range-len-for-index",
+      "signature": "A loop iterates over range of len only in order to index the sequence it is already walking.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "control-flow",
+      "tags": [
+        "loops",
+        "iteration",
+        "enumerate"
+      ],
+      "keywords": [
+        "range(len(",
+        "for i in range(len",
+        "[i]",
+        "[index]"
+      ]
+    },
+    {
+      "id": "shallow-copy-of-nested-data",
+      "signature": "A nested structure is copied with dict or copy, so the inner containers are still shared with the original.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "aliasing",
+        "defaults",
+        "configuration"
+      ],
+      "keywords": [
+        "dict(",
+        ".copy()",
+        "copy.copy",
+        "[:]",
+        ".update("
+      ]
+    },
+    {
+      "id": "shape-relied-on-broadcasting",
+      "signature": "Two arrays of different rank are combined arithmetically, so broadcasting produces a larger result than intended.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "numerics",
+      "tags": [
+        "numpy",
+        "pytorch",
+        "shapes",
+        "broadcasting"
+      ],
+      "keywords": [
+        "squeeze(",
+        "unsqueeze(",
+        "reshape(-1",
+        "(n, 1)",
+        "predictions - targets"
+      ]
+    },
+    {
+      "id": "shell-command-from-interpolated-string",
+      "signature": "A shell command is built by interpolating a value into a string and executed through a shell.",
+      "severity": "bug",
+      "category": "security",
+      "topic": "io",
+      "tags": [
+        "injection",
+        "subprocess",
+        "shell"
+      ],
+      "keywords": [
+        "shell=True",
+        "os.system(",
+        "subprocess.run(f",
+        "os.popen(",
+        "check=True"
+      ]
+    },
+    {
+      "id": "single-letter-name-for-domain-value",
+      "signature": "A single letter names a domain value rather than a loop index, so the code cannot be read without its definition.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "naming",
+      "tags": [
+        "naming",
+        "scope",
+        "house-style"
+      ],
+      "keywords": [
+        "def f(",
+        "for x in",
+        "m =",
+        "d =",
+        "p =",
+        "t ="
       ]
     },
     {
@@ -166,6 +930,158 @@
       ]
     },
     {
+      "id": "stringly-typed-mode-parameter",
+      "signature": "A parameter selects behaviour from a set of magic strings, so a typo is only caught at runtime if at all.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "typing",
+      "tags": [
+        "enums",
+        "api-design",
+        "magic-values"
+      ],
+      "keywords": [
+        "== \"train\"",
+        "== \"val\"",
+        "split=",
+        "mode=",
+        "raise ValueError"
+      ]
+    },
+    {
+      "id": "strip-used-to-remove-a-suffix",
+      "signature": "A multi-character argument to strip is written as though it removed a suffix, when it removes a set of characters.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "strings",
+      "tags": [
+        "suffixes",
+        "character-sets",
+        "filenames"
+      ],
+      "keywords": [
+        ".strip(",
+        ".lstrip(",
+        ".rstrip(",
+        ".strip(\".txt\")",
+        "removesuffix"
+      ]
+    },
+    {
+      "id": "super-init-not-called",
+      "signature": "A subclass __init__ never calls super().__init__, so the base class is left uninitialised.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "classes",
+      "tags": [
+        "inheritance",
+        "construction",
+        "pytorch"
+      ],
+      "keywords": [
+        "def __init__",
+        "super().__init__",
+        "nn.Module",
+        "class ",
+        "self.layer ="
+      ]
+    },
+    {
+      "id": "sys-path-mutated-to-find-modules",
+      "signature": "A module edits sys.path at import time so that a directory outside the package becomes importable.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "imports",
+      "tags": [
+        "packaging",
+        "import-path",
+        "scripts"
+      ],
+      "keywords": [
+        "sys.path.append",
+        "sys.path.insert",
+        "os.path.dirname(__file__)",
+        "../src"
+      ]
+    },
+    {
+      "id": "tensor-accumulated-with-graph-attached",
+      "signature": "A tensor that requires grad is added into a running total or list without detach, so every step's computation graph stays reachable.",
+      "severity": "trap",
+      "category": "performance",
+      "topic": "numerics",
+      "tags": [
+        "pytorch",
+        "autograd",
+        "memory",
+        "training-loop"
+      ],
+      "keywords": [
+        "total += loss",
+        "losses.append(loss",
+        ".detach()",
+        ".item()",
+        "loss.backward()"
+      ]
+    },
+    {
+      "id": "try-block-too-wide",
+      "signature": "A try block wraps several unrelated operations, so one handler answers for every failure inside it.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "exceptions",
+      "tags": [
+        "error-handling",
+        "scope",
+        "attribution"
+      ],
+      "keywords": [
+        "try:",
+        "except (",
+        "except KeyError",
+        "return None",
+        "json.loads"
+      ]
+    },
+    {
+      "id": "type-compared-with-equality",
+      "signature": "A type is checked with type and equality, so subclasses of the expected type fall through.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "typing",
+      "tags": [
+        "type-checking",
+        "subclasses",
+        "dispatch"
+      ],
+      "keywords": [
+        "type(",
+        ") == dict",
+        ") == list",
+        ") is str",
+        "type(value)"
+      ]
+    },
+    {
+      "id": "wall-clock-used-for-elapsed-time",
+      "signature": "A duration is measured by subtracting two time.time readings, which the system clock can move between.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "stdlib-misuse",
+      "tags": [
+        "timing",
+        "monotonic",
+        "benchmarks"
+      ],
+      "keywords": [
+        "time.time()",
+        "start = time.time",
+        "elapsed",
+        "time.monotonic",
+        "perf_counter"
+      ]
+    },
+    {
       "id": "wildcard-import",
       "signature": "A module is imported with a wildcard, dumping unknown names into the local namespace.",
       "severity": "trap",
@@ -179,6 +1095,44 @@
         "import *",
         "from os.path import *",
         "__all__"
+      ]
+    },
+    {
+      "id": "worker-processes-share-one-rng-seed",
+      "signature": "A dataset draws from the global numpy generator while loader workers are forked, so every worker replays the same random stream.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "concurrency",
+      "tags": [
+        "dataloader",
+        "randomness",
+        "forking",
+        "augmentation"
+      ],
+      "keywords": [
+        "num_workers",
+        "np.random.",
+        "DataLoader",
+        "__getitem__",
+        "worker_init_fn"
+      ]
+    },
+    {
+      "id": "zip-without-strict",
+      "signature": "Two sequences are zipped without strict, so a length mismatch silently truncates to the shorter one.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "control-flow",
+      "tags": [
+        "iteration",
+        "silent-truncation",
+        "pairing"
+      ],
+      "keywords": [
+        "zip(",
+        "for x, y in zip",
+        "strict=True",
+        "zip(inputs, targets)"
       ]
     }
   ]

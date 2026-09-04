@@ -34,7 +34,12 @@ Which Python feature the smell lives in. Exactly one per smell.
 - `strings` — string construction, formatting, encoding
 - `io` — files, paths, sockets, subprocesses
 - `concurrency` — threads, async, locks, timing
+- `numerics` — arrays, tensors, dtypes, shapes, and floating point arithmetic
 - `stdlib-misuse` — standard library APIs used against their design
+
+`numerics` covers the array-programming stack — `numpy`, `torch`, and their kin. It is not a standard library
+topic and it is not `mutability`, because the thing that goes wrong is arithmetic over shapes and dtypes rather
+than aliasing. Smells that merely *use* an array are filed by whatever they are actually about.
 
 `stdlib-misuse` is a deliberate escape hatch, so contributors are not forced into a bad fit. If it grows past
 roughly 15% of the corpus, split it into more specific topics.
