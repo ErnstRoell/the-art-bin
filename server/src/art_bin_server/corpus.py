@@ -152,7 +152,7 @@ class Corpus:
         return self.root / "catalog.json"
 
     def _snippet_paths(self) -> list[Path]:
-        return sorted((self.root / "snippets").glob("*/*.md"))
+        return sorted((self.root / "snippets").glob("*/*/*.md"))
 
     def _path_for(self, slug: str) -> Path | None:
         """Resolve a slug to a file without trusting it as a path component."""

@@ -47,6 +47,11 @@ _Avoid_: Exception, false positive, caveat, when it's OK
 The corrected version of a smell's snippet — what to write instead.
 _Avoid_: Fix, good version, solution, remedy
 
+**Group**:
+The directory a smell is filed under below its language — `code` or `architecture`. It
+selects the snippet size ceiling and carries no other meaning.
+_Avoid_: Kind, tier, section, folder
+
 **Catalog**:
 The compact summary of every smell in the corpus, small enough to be read whole.
 Holds signatures and labels, never snippets.

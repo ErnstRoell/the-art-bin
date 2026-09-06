@@ -9,6 +9,7 @@ tags: [adr, schema, corpus]
 category: adr
 related:
   - docs/002-snippet-design.md
+  - docs/adr/011-architecture-group-with-a-larger-ceiling.md
 ---
 
 # One Smell Per Markdown File
@@ -25,8 +26,10 @@ near-miss to state.
 
 ## Decision
 
-One file is one smell, at `snippets/<language>/<slug>.md`, with YAML frontmatter for machine-readable fields and
-exactly three body sections: the snippet, why it is bad, and the corrected version.
+One file is one smell, at `snippets/<language>/<slug>.md` — since amended to
+`snippets/<language>/<group>/<slug>.md` by [ADR 011](./011-architecture-group-with-a-larger-ceiling.md) — with
+YAML frontmatter for machine-readable fields and exactly three body sections: the snippet, why it is bad, and
+the corrected version.
 
 Snippets must satisfy `ast.parse` but need not run. Requiring runnable code would force scaffolding into
 snippets, which dilutes the illustration; requiring parseable code costs a one-line check and keeps the corpus

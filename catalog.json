@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "language": "python",
-  "count": 61,
+  "count": 83,
   "smells": [
     {
       "id": "abbreviated-identifier",
@@ -22,6 +22,69 @@
         "idx",
         "num_",
         "ret ="
+      ]
+    },
+    {
+      "id": "action-invoked-with-no-record-of-it",
+      "signature": "A request is carried out immediately by the handler that received it, so the program holds no object representing the action and cannot undo, queue, log or replay it.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "command",
+        "undo",
+        "queueing",
+        "auditing"
+      ],
+      "keywords": [
+        "def on_click",
+        "def on_",
+        "_clicked",
+        "doc.text =",
+        "nothing to undo",
+        "self.status("
+      ]
+    },
+    {
+      "id": "algorithm-chosen-by-flag-inside-the-class",
+      "signature": "One mode flag is re-tested in every method of a class, so a single algorithm is smeared across the class instead of living in one object.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "strategy",
+        "dispatch",
+        "modes",
+        "open-closed"
+      ],
+      "keywords": [
+        "self.mode ==",
+        "if self.kind ==",
+        "self.mode",
+        "elif self.mode",
+        "def __init__(self, mode",
+        "mode="
+      ]
+    },
+    {
+      "id": "algorithm-skeleton-duplicated-per-variant",
+      "signature": "Two variants of one procedure are written as two copies of the whole procedure, so the steps they share are duplicated and drift apart.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "functions",
+      "tags": [
+        "template-method",
+        "duplication",
+        "hooks",
+        "pipelines"
+      ],
+      "keywords": [
+        "def import_",
+        "def load_",
+        "with transaction()",
+        "log.info(",
+        "for record in",
+        "return len("
       ]
     },
     {
@@ -137,6 +200,27 @@
       ]
     },
     {
+      "id": "base-class-names-its-concrete-product",
+      "signature": "A method hardcodes the concrete class it constructs, so a variant subclass copies the whole method in order to change the one line that names the product.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "factory-method",
+        "subclassing",
+        "duplication",
+        "open-closed"
+      ],
+      "keywords": [
+        "class ",
+        "(Exporter)",
+        "def run(self",
+        "Writer(",
+        "super().",
+        "= CsvWriter("
+      ]
+    },
+    {
       "id": "blocking-call-in-async-function",
       "signature": "An async function calls a blocking library or time.sleep, so the event loop stops until that call returns.",
       "severity": "trap",
@@ -230,6 +314,48 @@
       ]
     },
     {
+      "id": "caching-repeated-around-every-call",
+      "signature": "The check-cache-then-fetch-then-store dance around an expensive call is retyped at every call site, so key layout, expiry and invalidation are decided independently in each one.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "classes",
+      "tags": [
+        "proxy",
+        "caching",
+        "invalidation",
+        "boundary"
+      ],
+      "keywords": [
+        "redis.get",
+        "cache.get",
+        "setex",
+        "json.dumps",
+        "if hit is not None",
+        "f\"user:{"
+      ]
+    },
+    {
+      "id": "components-wired-to-each-other-directly",
+      "signature": "Peer components hold references to each other and call each other directly, so the workflow connecting them exists only as a web of point-to-point calls.",
+      "severity": "taste",
+      "category": "testability",
+      "topic": "classes",
+      "tags": [
+        "mediator",
+        "coupling",
+        "ui",
+        "workflow"
+      ],
+      "keywords": [
+        "def __init__(self, results",
+        "self._detail",
+        "self._spinner",
+        ".on_submit(",
+        "self._history",
+        "widget"
+      ]
+    },
+    {
       "id": "constructor-does-io",
       "signature": "A constructor reads files or opens connections, so the object cannot be created without its environment.",
       "severity": "trap",
@@ -247,6 +373,27 @@
         "torch.load",
         "requests.get",
         ".glob("
+      ]
+    },
+    {
+      "id": "copy-written-field-by-field",
+      "signature": "A copy of an object is built by listing its fields at the call site, so a field added later is dropped or shared by every copy written that way.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "classes",
+      "tags": [
+        "prototype",
+        "copying",
+        "aliasing",
+        "drift"
+      ],
+      "keywords": [
+        "copy.copy",
+        "deepcopy",
+        "Config(",
+        "= base.",
+        "replace(",
+        "vars(self)"
       ]
     },
     {
@@ -347,6 +494,27 @@
       ]
     },
     {
+      "id": "foreign-payload-reshaped-at-every-call-site",
+      "signature": "A foreign API's payload shape is translated into local terms inline wherever it is used, so the translation exists once per call site instead of once per API.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "adapter",
+        "boundary",
+        "third-party",
+        "translation"
+      ],
+      "keywords": [
+        "[\"data\"]",
+        "_cents",
+        "fromtimestamp",
+        "raw[",
+        "payload[",
+        "response.json()["
+      ]
+    },
+    {
       "id": "function-call-as-default-argument",
       "signature": "A default argument is a function call, so it is evaluated once at definition time and frozen for the life of the process.",
       "severity": "trap",
@@ -424,6 +592,27 @@
       ]
     },
     {
+      "id": "half-built-object-passed-around",
+      "signature": "An object is created empty and completed by assigning its attributes one at a time, so every partially built state is an object the type cannot distinguish from a finished one.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "classes",
+      "tags": [
+        "builder",
+        "invariants",
+        "initialisation",
+        "immutability"
+      ],
+      "keywords": [
+        "= None",
+        "def __init__(self):",
+        ".title =",
+        ".rows =",
+        "obj = ",
+        "setattr("
+      ]
+    },
+    {
       "id": "hardcoded-cuda-device",
       "signature": "Code names cuda directly instead of taking a device, so it cannot run on cpu or on a chosen gpu.",
       "severity": "trap",
@@ -440,6 +629,48 @@
         "cuda:0",
         "torch.device",
         ".to(device)"
+      ]
+    },
+    {
+      "id": "identical-value-copied-into-every-instance",
+      "signature": "Every object in a large collection carries its own copy of state that is identical across them, so memory and setup cost scale with the number of objects rather than the number of distinct values.",
+      "severity": "trap",
+      "category": "performance",
+      "topic": "classes",
+      "tags": [
+        "flyweight",
+        "memory",
+        "sharing",
+        "immutability"
+      ],
+      "keywords": [
+        "for _ in range(",
+        "load_sprite",
+        "list(",
+        "copy(",
+        "def __init__(self, x, y",
+        "[Particle("
+      ]
+    },
+    {
+      "id": "internal-collection-returned-for-iteration",
+      "signature": "A class hands out the list it stores so callers can loop over it, so any caller can reach the object's internals through the value it was given.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "iterator",
+        "encapsulation",
+        "aliasing",
+        "protocols"
+      ],
+      "keywords": [
+        "return self._items",
+        "return self._tracks",
+        "def items(self)",
+        ".extend(",
+        "for x in obj.items()",
+        "self._"
       ]
     },
     {
@@ -512,6 +743,27 @@
         ".append(lambda",
         "def inner",
         "functools.partial"
+      ]
+    },
+    {
+      "id": "leaf-and-branch-handled-by-the-caller",
+      "signature": "Every walk over a tree branches on whether a node is a leaf or a group, so the same case analysis is repeated in each traversal.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "control-flow",
+      "tags": [
+        "composite",
+        "recursion",
+        "polymorphism",
+        "trees"
+      ],
+      "keywords": [
+        "isinstance(node",
+        "node.children",
+        "for child in",
+        "hasattr(",
+        "isinstance(child, list)",
+        "recursion"
       ]
     },
     {
@@ -703,6 +955,48 @@
       ]
     },
     {
+      "id": "operation-added-to-every-class-in-a-hierarchy",
+      "signature": "Each new operation over a stable set of types is added as a method on every one of those types, so one concern is spread across all of them and each class collects unrelated reasons to change.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "visitor",
+        "double-dispatch",
+        "separation-of-concerns",
+        "expression-problem"
+      ],
+      "keywords": [
+        "def to_svg(self)",
+        "def to_json(self)",
+        "def price(self",
+        "def validate(self",
+        "class Circle",
+        "def accept("
+      ]
+    },
+    {
+      "id": "optional-behaviour-stacked-as-flags",
+      "signature": "A function takes several boolean switches for independent optional behaviours, so its body interleaves all of them and the number of paths through it doubles with each flag.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "functions",
+      "tags": [
+        "decorator",
+        "composition",
+        "boolean-parameters",
+        "wrapping"
+      ],
+      "keywords": [
+        "retry=False",
+        "cache=False",
+        "verbose=False",
+        "if log:",
+        "if cache",
+        "=False,"
+      ]
+    },
+    {
       "id": "optional-dependency-import-swallowed",
       "signature": "An optional import is wrapped in try and except ImportError with no fallback, so the name is simply absent later.",
       "severity": "trap",
@@ -779,6 +1073,48 @@
       ]
     },
     {
+      "id": "processing-steps-nailed-into-one-function",
+      "signature": "Independent policy steps are hardcoded as a fixed sequence of early returns in one function, so no caller can add, remove or reorder them.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "control-flow",
+      "tags": [
+        "chain-of-responsibility",
+        "middleware",
+        "policy",
+        "composition"
+      ],
+      "keywords": [
+        "def handle(",
+        "return deny(",
+        "if not request.",
+        "rate_limited(",
+        "return None",
+        "early return"
+      ]
+    },
+    {
+      "id": "product-family-selected-part-by-part",
+      "signature": "Each member of a product family is chosen by its own branch on the same setting, so nothing enforces that the parts assembled together come from one family.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "classes",
+      "tags": [
+        "abstract-factory",
+        "dispatch",
+        "configuration",
+        "coupling"
+      ],
+      "keywords": [
+        "if cloud ==",
+        "elif provider ==",
+        "if backend ==",
+        "= S3",
+        "= Gcs",
+        "os.environ["
+      ]
+    },
+    {
       "id": "raise-without-from-in-except",
       "signature": "An exception is raised inside an except block without from, so the traceback reads as a failure in the handler itself.",
       "severity": "taste",
@@ -852,6 +1188,27 @@
         "reshape(-1",
         "(n, 1)",
         "predictions - targets"
+      ]
+    },
+    {
+      "id": "shared-resource-reconstructed-per-caller",
+      "signature": "A class holding shared state or an expensive resource is instantiated afresh by each caller, so the copies disagree with each other and the cost is paid once per call site.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "classes",
+      "tags": [
+        "singleton",
+        "shared-state",
+        "caching",
+        "composition-root"
+      ],
+      "keywords": [
+        "= Client()",
+        "= Flags()",
+        "Settings()",
+        "def __init__(self)",
+        "requests.get",
+        "load_config()"
       ]
     },
     {
@@ -933,6 +1290,27 @@
       ]
     },
     {
+      "id": "state-machine-encoded-in-boolean-flags",
+      "signature": "Several boolean attributes encode one state, so the object can hold combinations no real state corresponds to and every method re-tests the flags.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "control-flow",
+      "tags": [
+        "state",
+        "invariants",
+        "flags",
+        "lifecycle"
+      ],
+      "keywords": [
+        "is_draft",
+        "is_active",
+        "is_closed",
+        "self.is_",
+        "= True",
+        "if self.is_"
+      ]
+    },
+    {
       "id": "string-concatenation-in-a-loop",
       "signature": "A string is accumulated with += inside a loop instead of being joined at the end.",
       "severity": "taste",
@@ -985,6 +1363,71 @@
         ".rstrip(",
         ".strip(\".txt\")",
         "removesuffix"
+      ]
+    },
+    {
+      "id": "subclass-per-combination-of-two-axes",
+      "signature": "One class hierarchy varies along two independent axes at once, so the number of subclasses is the product of the two lists rather than their sum.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "bridge",
+        "composition",
+        "inheritance",
+        "combinatorics"
+      ],
+      "keywords": [
+        "class Urgent",
+        "class Sms",
+        "(EmailNotifier)",
+        "(Notifier)",
+        "super().send",
+        "class "
+      ]
+    },
+    {
+      "id": "subject-calls-its-listeners-by-name",
+      "signature": "The object that changed calls each interested subsystem by name, so it depends on every consumer of its own event.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "observer",
+        "events",
+        "coupling",
+        "notifications"
+      ],
+      "keywords": [
+        "send_email(",
+        "update_inventory(",
+        "record_metric(",
+        "notify_",
+        "self.status =",
+        "def pay(self)"
+      ]
+    },
+    {
+      "id": "subsystem-wired-up-at-every-call-site",
+      "signature": "A caller builds several collaborators of a subsystem it does not own and sequences their setup, ordering and teardown itself, so the same wiring is retyped at every call site.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "facade",
+        "dispatch",
+        "coupling",
+        "composition-root",
+        "lifecycle"
+      ],
+      "keywords": [
+        ".connect()",
+        ".close()",
+        "= Client(",
+        "= Repository(",
+        "= Mailer(",
+        "boto3.client",
+        "Session("
       ]
     },
     {
@@ -1080,6 +1523,27 @@
         ") == list",
         ") is str",
         "type(value)"
+      ]
+    },
+    {
+      "id": "undo-implemented-by-restoring-fields",
+      "signature": "A caller saves an object's state for rollback by copying out the attributes it happens to know about, so a field added later is never restored.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "memento",
+        "rollback",
+        "snapshot",
+        "encapsulation"
+      ],
+      "keywords": [
+        "old_",
+        "saved_",
+        "= order.total",
+        "except",
+        "order.total =",
+        "rollback"
       ]
     },
     {

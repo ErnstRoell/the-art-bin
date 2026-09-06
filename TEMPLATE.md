@@ -18,7 +18,7 @@ source: your-handle
 ## Smell
 
 ```python
-# At most 15 lines. One smell. Must parse; need not run.
+# At most 15 lines in code/, 40 in architecture/. One smell. Must parse; need not run.
 # Write this from scratch — never paste from a real codebase.
 ```
 

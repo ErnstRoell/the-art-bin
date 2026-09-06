@@ -3,7 +3,7 @@ title: Snippet Design
 description: The anatomy of a smell file — frontmatter fields, body sections, taxonomy, and enforced constraints.
 status: draft
 created: 2026-09-04
-updated: 2026-09-04
+updated: 2026-09-06
 author: ernst
 tags: [schema, corpus, frontmatter, validation]
 category: reference
@@ -22,7 +22,14 @@ from.
 
 ## File Location And Identity
 
-Files live at `snippets/<language>/<slug>.md`. Today that is only `snippets/python/`.
+Files live at `snippets/<language>/<group>/<slug>.md`. Today that is `snippets/python/code/` and
+`snippets/python/architecture/`.
+
+**The group is a size ceiling, not a taxonomy.** `code` allows 15 snippet lines and holds almost everything;
+`architecture` allows 40, for smells whose mechanism is the relationship between several pieces of code and
+which therefore cannot be shown in one function ([ADR 011](./adr/011-architecture-group-with-a-larger-ceiling.md)).
+It is deliberately not a frontmatter field and deliberately not in the catalog: a smell's meaning does not
+change with its length, so nothing downstream should branch on it.
 
 **The filename is the identifier.** There is no `id` field; duplicating the slug into frontmatter would only
 create something to drift. A slug is lowercase, hyphen-separated, and matches `[a-z0-9-]+`.
@@ -170,12 +177,17 @@ Three notes on maintaining these:
 
 ### Snippet Size
 
-**The `## Smell` block is at most 15 lines, enforced.** This serves three goals at once: signal-to-noise, since
-scaffolding dilutes the thing being illustrated; scope, since anything longer is an architectural pattern that
-does not fit this schema; and non-recognisability, since no real code is ever that small, so the ceiling forces
-reconstruction rather than pasting ([ADR 009](./adr/009-reconstructed-snippets-and-licensing.md)).
+**The `## Smell` block is at most 15 lines in `code/` and 40 in `architecture/`, enforced.** The ceiling serves
+three goals at once: signal-to-noise, since scaffolding dilutes the thing being illustrated; scope, since a
+smell that keeps growing is a system being described rather than a smell; and non-recognisability, since no real
+code is that small, so the ceiling forces reconstruction rather than pasting
+([ADR 009](./adr/009-reconstructed-snippets-and-licensing.md)).
 
-Longer smells and architecture-level anti-patterns are explicitly out of scope for now.
+The `architecture/` ceiling is not a relaxation of that reasoning but the same reasoning applied to a smell
+whose evidence is two call sites rather than one function. It is chosen per file by the directory the file sits
+in, so the limit is legible from the path and cannot be argued up inside a snippet.
+
+Smells needing more than 40 lines remain out of scope.
 
 ### Parseability
 
@@ -207,7 +219,8 @@ quality, so every failure reports the file, the field, and what was expected.
 | Required fields | Every required field is present and non-empty |
 | Taxonomy | `category` and `topic` appear in `TAXONOMY.md` |
 | Severity | `severity` is one of `bug`, `trap`, `taste` |
-| Snippet size | The `## Smell` block is 15 lines or fewer |
+| Snippet size | The `## Smell` block is within its group's ceiling — 15 lines in `code/`, 40 in `architecture/` |
+| Group | The file sits in a known group directory: `code/` or `architecture/` |
 | Parseability | Both code blocks pass `ast.parse` |
 | Sentences | `signature` and `distinguish` are each a single sentence |
 | Slug | Filename matches `[a-z0-9-]+` and equals no other file's slug |

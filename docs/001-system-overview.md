@@ -36,8 +36,10 @@ knowledge base rather than a style guide.
 
 ### The Corpus
 
-A directory of markdown files, one per smell, at `snippets/<language>/<slug>.md`. Python is the only language
-today; the path carries the language so that adding another later is a new directory rather than a migration.
+A directory of markdown files, one per smell, at `snippets/<language>/<group>/<slug>.md`. Python is the only
+language today; the path carries the language so that adding another later is a new directory rather than a
+migration. The group is `code` or `architecture`, and selects only the snippet size ceiling
+([ADR 011](./adr/011-architecture-group-with-a-larger-ceiling.md)).
 Each file holds YAML frontmatter (the machine-readable part) and a short body: the offending snippet, why it is
 bad, and the corrected version. The corpus is the source of truth and the actual product — everything else is
 machinery around it. The full anatomy is in [Snippet Design](./002-snippet-design.md).
@@ -120,7 +122,10 @@ metadata search over the existing fields — not embeddings.
 │   └── adr/
 ├── snippets/
 │   └── python/
-│       └── <slug>.md
+│       ├── code/           # 15-line ceiling
+│       │   └── <slug>.md
+│       └── architecture/   # 40-line ceiling
+│           └── <slug>.md
 └── server/                 # the MCP server
 ```
 
@@ -134,8 +139,9 @@ The following are deliberate exclusions, not gaps:
 - **The server does not judge.** It serves records. All matching and reporting is the caller's job.
 - **Snippets are reconstructions, never pasted from real codebases.** This is a legal and social constraint as
   much as an editorial one ([ADR 009](./adr/009-reconstructed-snippets-and-licensing.md)).
-- **Fifteen lines is a hard ceiling.** Longer smells and architectural anti-patterns are a later project with a
-  different shape; they do not fit this schema and should not be forced into it.
+- **The snippet ceiling is hard.** Fifteen lines in `code/`, forty in `architecture/` for the few smells that
+  are a relationship between components rather than a passage of code. Anything larger is a system, not a
+  smell, and does not fit this schema.
 - **No embeddings, no vector store, no scoring model.**
 
 ## Related Documents
