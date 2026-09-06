@@ -50,7 +50,7 @@ async def test_no_tool_accepts_source_code() -> None:
 async def test_list_then_get_round_trip() -> None:
     async with connect() as client:
         catalog = payload(await client.call_tool("list_smells", {}))
-        assert catalog["count"] == 10
+        assert catalog["count"] == len(catalog["smells"]) >= 2
         assert "distinguish" not in catalog["smells"][0]
 
         shortlist = [catalog["smells"][0]["id"], catalog["smells"][1]["id"]]

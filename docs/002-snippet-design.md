@@ -155,10 +155,12 @@ file — not something a contributor does in passing ([ADR 003](./adr/003-two-ax
 **`topic`** — the Python feature it lives in:
 
 `exceptions`, `mutability`, `typing`, `naming`, `functions`, `classes`, `control-flow`, `imports`, `strings`,
-`io`, `concurrency`, `stdlib-misuse`
+`io`, `concurrency`, `numerics`, `stdlib-misuse`
 
-Two notes on maintaining these:
+Three notes on maintaining these:
 
+- `numerics` covers the array-programming stack rather than a language feature, because shape and dtype
+  arithmetic is where a large share of scientific Python goes wrong and no other topic describes it.
 - `stdlib-misuse` is a deliberate escape hatch, so contributors are not forced into a bad fit. If it grows past
   roughly 15% of the corpus, split it.
 - There is no `style` category. That axis is what `severity: taste` carries; having both invites the same smell
