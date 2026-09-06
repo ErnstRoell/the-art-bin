@@ -10,7 +10,7 @@ keywords: [".connect()", ".close()", "= Client(", "= Repository(", "= Mailer(", 
 signature: "A caller builds several collaborators of a subsystem it does not own and sequences their setup, ordering and teardown itself, so the same wiring is retyped at every call site."
 distinguish: "Fine in a composition root, whose whole job is assembling collaborators once and handing them to the code that uses them."
 added: 2026-09-06
-source: ernst
+source: refactoring.guru
 ---
 
 # Subsystem wired up at every call site

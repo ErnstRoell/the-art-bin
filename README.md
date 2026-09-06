@@ -26,7 +26,7 @@ time. This makes it addressable.
 | Path | What it is |
 | --- | --- |
 | `snippets/python/code/` | The corpus. One smell per file, 15 lines or fewer. |
-| `snippets/python/architecture/` | Smells that live between components, where 15 lines cannot show the problem. |
+| `snippets/python/architecture/` | Smells that live between components, where 15 lines cannot show the problem. One entry per Gang of Four pattern, describing the code the pattern answers. |
 | `catalog.json` | Generated summary of every smell, small enough to read whole. |
 | `TAXONOMY.md` | The closed lists a smell is filed against. |
 | `TEMPLATE.md` | Skeleton for a new smell. |

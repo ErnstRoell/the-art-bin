@@ -46,7 +46,12 @@ Everything else in the schema applies identically to both groups.
 ## Consequences
 
 - Architecture-level smells are in scope, and the corpus can name the pattern-shaped findings that reviewers
-  actually raise. `snippets/python/architecture/subsystem-wired-up-at-every-call-site.md` is the first.
+  actually raise. `architecture/` opens with one entry per Gang of Four pattern — 22 files, each describing the
+  code that the pattern is the answer to, credited `source: refactoring.guru`.
+- A corpus with an entry per pattern can be read as "not using the pattern is a smell", which would turn the
+  server into a generator of speculative indirection. The guard is `distinguish`: every one of the 22 names the
+  case where the plain code is right and the pattern is overbuilding. This is the field to review hardest in
+  those entries, and the reason a reviewer should resist adding pattern entries without one.
 - The ceiling is visible in the path, so it is chosen once when the file is created rather than negotiated per
   snippet, and `code/` keeps the pressure that makes its entries readable at a glance.
 - Every existing snippet moved to `snippets/python/code/`. Identifiers are filenames, so nothing citing a smell
