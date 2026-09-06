@@ -9,6 +9,7 @@ tags: [adr, licensing, provenance, contributions]
 category: adr
 related:
   - docs/002-snippet-design.md
+  - docs/adr/011-architecture-group-with-a-larger-ceiling.md
 ---
 
 # Snippets Are Reconstructions, Licensed CC0
@@ -26,9 +27,10 @@ purpose is to be ingested, including by model trainers; the server is software.
 ## Decision
 
 Snippets are **minimal reconstructions written to illustrate a smell**, never excerpts of any real codebase, and
-this is stated in `README.md` and `CONTRIBUTING.md`. The 15-line ceiling and the one-smell-per-snippet rule are
+this is stated in `README.md` and `CONTRIBUTING.md`. The snippet ceiling and the one-smell-per-snippet rule are
 enforced in CI and are what make that claim true in practice rather than merely asserted — no real code is that
-small or that single-purpose, so the constraints force rewriting.
+small or that single-purpose, so the constraints force rewriting. ([ADR 011](./011-architecture-group-with-a-larger-ceiling.md)
+raised the ceiling to 40 lines for `architecture/`, which is still far below any real call site.)
 
 `source` is optional credit for the contributor of the smell. It is not a code provenance field.
 

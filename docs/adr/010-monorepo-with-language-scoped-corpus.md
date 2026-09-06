@@ -9,6 +9,7 @@ tags: [adr, repository, layout]
 category: adr
 related:
   - docs/001-system-overview.md
+  - docs/adr/011-architecture-group-with-a-larger-ceiling.md
 ---
 
 # Monorepo With A Language-Scoped Corpus
@@ -25,7 +26,8 @@ the only language planned, but the project is not inherently Python-specific and
 One repository containing both `snippets/` and `server/`.
 
 Corpus files live at `snippets/<language>/<slug>.md`, so Python content starts at `snippets/python/`. Each file
-also carries a `language` field, making it self-describing outside its directory.
+also carries a `language` field, making it self-describing outside its directory. ([ADR 011](./011-architecture-group-with-a-larger-ceiling.md)
+later inserted a group directory below the language, leaving the language-scoping decision here intact.)
 
 ## Consequences
 

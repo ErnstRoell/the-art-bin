@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "language": "python",
-  "count": 61,
+  "count": 62,
   "smells": [
     {
       "id": "abbreviated-identifier",
@@ -985,6 +985,29 @@
         ".rstrip(",
         ".strip(\".txt\")",
         "removesuffix"
+      ]
+    },
+    {
+      "id": "subsystem-wired-up-at-every-call-site",
+      "signature": "A caller builds several collaborators of a subsystem it does not own and sequences their setup, ordering and teardown itself, so the same wiring is retyped at every call site.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "facade",
+        "dispatch",
+        "coupling",
+        "composition-root",
+        "lifecycle"
+      ],
+      "keywords": [
+        ".connect()",
+        ".close()",
+        "= Client(",
+        "= Repository(",
+        "= Mailer(",
+        "boto3.client",
+        "Session("
       ]
     },
     {

@@ -25,7 +25,8 @@ time. This makes it addressable.
 
 | Path | What it is |
 | --- | --- |
-| `snippets/python/` | The corpus. One smell per file. |
+| `snippets/python/code/` | The corpus. One smell per file, 15 lines or fewer. |
+| `snippets/python/architecture/` | Smells that live between components, where 15 lines cannot show the problem. |
 | `catalog.json` | Generated summary of every smell, small enough to read whole. |
 | `TAXONOMY.md` | The closed lists a smell is filed against. |
 | `TEMPLATE.md` | Skeleton for a new smell. |
@@ -55,7 +56,7 @@ goes to the model; the model does the judging. See [server/README.md](./server/R
 ## Adding a smell
 
 ```sh
-cp TEMPLATE.md snippets/python/my-new-smell.md
+cp TEMPLATE.md snippets/python/code/my-new-smell.md
 # write it
 uv run validate.py --write-catalog
 ```

@@ -29,7 +29,8 @@ TAXONOMY = ROOT / "TAXONOMY.md"
 CATALOG = ROOT / "catalog.json"
 
 SCHEMA_VERSION = 1
-MAX_SNIPPET_LINES = 15
+# The ceiling on a `## Smell` block, per group directory. See docs/002-snippet-design.md.
+SNIPPET_LINES = {"code": 15, "architecture": 40}
 SEVERITIES = ("bug", "trap", "taste")
 SLUG_RE = re.compile(r"^[a-z0-9-]+$")
 
@@ -142,8 +143,12 @@ def check_file(path: Path, taxonomy: dict[str, set[str]], errors: Errors) -> dic
         if value and value not in allowed:
             errors.add(where, field, f"{value!r} is not listed under ## {heading.title()} in TAXONOMY.md")
 
-    if (language := meta.get("language")) and language != path.parent.name:
-        errors.add(where, "language", f"{language!r} does not match directory {path.parent.name!r}")
+    group = path.parent.name
+    language_dir = path.parent.parent.name
+    if group not in SNIPPET_LINES:
+        errors.add(where, None, f"group directory {group!r} is not one of {', '.join(SNIPPET_LINES)}")
+    if (language := meta.get("language")) and language != language_dir:
+        errors.add(where, "language", f"{language!r} does not match directory {language_dir!r}")
 
     for field in ("tags", "keywords", "aliases"):
         if field in meta and not isinstance(meta[field], list):
@@ -181,8 +186,9 @@ def check_file(path: Path, taxonomy: dict[str, set[str]], errors: Errors) -> dic
         if language_tag != "python":
             errors.add(where, name, f"code fence must be tagged python, got {language_tag!r}")
         lines = code.rstrip("\n").splitlines()
-        if name == "Smell" and len(lines) > MAX_SNIPPET_LINES:
-            errors.add(where, name, f"snippet is {len(lines)} lines, limit is {MAX_SNIPPET_LINES}")
+        limit = SNIPPET_LINES.get(group)
+        if name == "Smell" and limit is not None and len(lines) > limit:
+            errors.add(where, name, f"snippet is {len(lines)} lines, limit for {group}/ is {limit}")
         try:
             ast.parse(code)
         except SyntaxError as exc:
@@ -227,7 +233,7 @@ def main() -> int:
     errors = Errors()
     taxonomy = load_taxonomy()
 
-    paths = sorted(SNIPPETS.glob("*/*.md"))
+    paths = sorted(SNIPPETS.glob("*/*/*.md"))
     if not paths:
         print(f"FAIL no smell files found under {SNIPPETS}", file=sys.stderr)
         return 1
