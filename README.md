@@ -31,7 +31,8 @@ time. This makes it addressable.
 | `TAXONOMY.md` | The closed lists a smell is filed against. |
 | `TEMPLATE.md` | Skeleton for a new smell. |
 | `validate.py` | Schema and constraint checks. Runs in CI. |
-| `server/` | The MCP server. |
+| `src/art_bin_server/` | The MCP server. |
+| `tests/` | Tests for the server, run against the real corpus. |
 | `CONTEXT.md` | The project glossary. |
 | `docs/` | Design documents and architecture decision records. |
 
@@ -44,14 +45,42 @@ Register the MCP server with your client and ask it to review code:
   "mcpServers": {
     "the-art-bin": {
       "command": "uv",
-      "args": ["--directory", "/path/to/the-art-bin/server", "run", "art-bin-server"]
+      "args": ["--directory", "/path/to/the-art-bin", "run", "art-bin-server"]
     }
   }
 }
 ```
 
-It exposes three read-only tools — `list_smells`, `get_smells`, `get_taxonomy` — and no analysis. The corpus
-goes to the model; the model does the judging. See [server/README.md](./server/README.md).
+It exposes three read-only tools and no analysis — nothing here accepts source code, scores anything, or
+decides what matches. The corpus goes to the model; the model does the judging
+([ADR 001](./docs/adr/001-corpus-as-queryable-knowledge-base.md)).
+
+| Tool | Returns |
+| --- | --- |
+| `list_smells` | The whole catalog: id, signature, severity, category, topic, tags, keywords. Optional filters for severity, category, topic, language and `python_version`. |
+| `get_smells` | Full records for specific ids: snippet, why it's bad, corrected version, and `distinguish`. Aliases resolve; unknown ids come back in `unknown`. |
+| `get_taxonomy` | The closed lists with corpus counts, for building valid filters. |
+
+Callers are expected to work in two phases — one `list_smells` to shortlist, one `get_smells` to confirm. The
+server's `instructions` field states that contract, and the full surface is specified in
+[MCP API Overview](./docs/003-mcp-api-overview.md).
+
+The server finds the corpus by walking up from its own location until it finds a directory containing both
+`catalog.json` and `snippets/`. Set `ART_BIN_ROOT` to point somewhere else — which is what a deployment that
+separates the server from the corpus would do.
+
+## Developing the server
+
+```sh
+uv sync
+uv run pytest -q          # 27 tests, including 7 over a real stdio subprocess
+uv run art-bin-server     # start on stdio
+```
+
+`src/art_bin_server/corpus.py` is the reading layer — catalog, record parsing, alias resolution, filters — and
+`src/art_bin_server/server.py` is the tool surface. Frontmatter parsing is deliberately duplicated between
+`corpus.py` and `validate.py`, so that contributors can validate a snippet without installing the server. The
+schema they agree on is [Snippet Design](./docs/002-snippet-design.md).
 
 ## Adding a smell
 

@@ -115,6 +115,7 @@ metadata search over the existing fields — not embeddings.
 ├── CONTRIBUTING.md
 ├── catalog.json            # generated, committed
 ├── validate.py             # schema and constraint checks, run in CI
+├── pyproject.toml          # the MCP server package, art-bin-server
 ├── docs/
 │   ├── 001-system-overview.md
 │   ├── 002-snippet-design.md
@@ -126,7 +127,9 @@ metadata search over the existing fields — not embeddings.
 │       │   └── <slug>.md
 │       └── architecture/   # 40-line ceiling
 │           └── <slug>.md
-└── server/                 # the MCP server
+├── src/
+│   └── art_bin_server/     # the MCP server
+└── tests/                  # server tests, run against the real corpus
 ```
 
 Corpus and server live in one repository while the schema is still moving, so that "add a field" and "teach the

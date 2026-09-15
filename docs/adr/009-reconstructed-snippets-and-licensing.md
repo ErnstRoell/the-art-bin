@@ -34,8 +34,8 @@ raised the ceiling to 40 lines for `architecture/`, which is still far below any
 
 `source` is optional credit for the contributor of the smell. It is not a code provenance field.
 
-`snippets/` is licensed CC0. `server/` is licensed MIT. Both carry the standard no-warranty, no-liability terms,
-pointed at from `README.md`.
+`snippets/` is licensed CC0. The server under `src/` is licensed MIT. Both carry the standard no-warranty,
+no-liability terms, pointed at from `README.md`.
 
 ## Consequences
 
