@@ -38,7 +38,28 @@ time. This makes it addressable.
 
 ## Using it
 
-Register the MCP server with your client and ask it to review code:
+Install it as a tool, which puts `art-bin-server` on your PATH:
+
+```sh
+uv tool install .            # from a clone
+uv tool install git+https://github.com/ErnstRoell/the-art-bin
+```
+
+The wheel bundles the corpus, so the installed server needs no checkout to read from:
+
+```json
+{
+  "mcpServers": {
+    "the-art-bin": {
+      "command": "art-bin-server"
+    }
+  }
+}
+```
+
+An install is a snapshot of the corpus as of that build — `uv tool upgrade art-bin-server` to pick up new
+smells. To serve the corpus live from a clone instead, which is what you want while adding smells, register it
+against the checkout:
 
 ```json
 {
@@ -65,9 +86,10 @@ Callers are expected to work in two phases — one `list_smells` to shortlist, o
 server's `instructions` field states that contract, and the full surface is specified in
 [MCP API Overview](./docs/003-mcp-api-overview.md).
 
-The server finds the corpus by walking up from its own location until it finds a directory containing both
-`catalog.json` and `snippets/`. Set `ART_BIN_ROOT` to point somewhere else — which is what a deployment that
-separates the server from the corpus would do.
+The server finds the corpus in three steps, first match wins: `ART_BIN_ROOT`, then the first directory above
+its own location holding both `catalog.json` and `snippets/`, then the copy bundled into the wheel. A clone
+therefore beats the bundle, so a contributor always reads their own edits. Set `ART_BIN_ROOT` to override both
+— which is what a deployment that separates the server from the corpus would do.
 
 ## Developing the server
 

@@ -23,6 +23,9 @@ from packaging.specifiers import InvalidSpecifier, SpecifierSet
 
 SCHEMA_VERSION = 1
 
+#: Where the wheel keeps its copy of the corpus, relative to this module.
+BUNDLED_DIRNAME = "_corpus"
+
 FRONTMATTER_RE = re.compile(r"\A---\n(.*?)\n---\n(.*)\Z", re.DOTALL)
 FENCE_RE = re.compile(r"```\w*\n(.*?)```", re.DOTALL)
 H1_RE = re.compile(r"^# (.+)$", re.MULTILINE)
@@ -46,11 +49,28 @@ class CorpusError(RuntimeError):
     """The corpus on disk is missing or unreadable."""
 
 
-def find_root(start: Path | None = None) -> Path:
-    """Locate the repository root, i.e. the directory holding catalog.json and snippets/.
+def _is_root(path: Path) -> bool:
+    return (path / "catalog.json").is_file() and (path / "snippets").is_dir()
 
-    ``ART_BIN_ROOT`` overrides the search, which is what a deployment that separates the
-    server from the corpus would set.
+
+def _bundled_root(base: Path | None = None) -> Path | None:
+    """The corpus copy shipped inside the wheel, or None when running from a checkout.
+
+    ``uv tool install`` drops the package into a venv with no corpus anywhere above it, so
+    an installed server reads the copy force-included beside this module (see pyproject).
+    """
+    root = (base or Path(__file__).resolve().parent) / BUNDLED_DIRNAME
+    return root if _is_root(root) else None
+
+
+def find_root(start: Path | None = None) -> Path:
+    """Locate the corpus root, i.e. the directory holding catalog.json and snippets/.
+
+    Resolution order: ``ART_BIN_ROOT``, then the checkout this module lives in, then the
+    copy bundled into the wheel. The checkout wins over the bundle so a contributor
+    running from a clone always reads their own edits; the bundle is what makes an
+    installed tool work at all. ``ART_BIN_ROOT`` overrides both, which is what a
+    deployment that separates the server from the corpus would set.
     """
     if override := os.environ.get("ART_BIN_ROOT"):
         root = Path(override).expanduser().resolve()
@@ -59,11 +79,16 @@ def find_root(start: Path | None = None) -> Path:
         return root
 
     for candidate in (start or Path(__file__).resolve()).parents:
-        if (candidate / "catalog.json").is_file() and (candidate / "snippets").is_dir():
+        if _is_root(candidate):
             return candidate
+
+    if bundled := _bundled_root():
+        return bundled
+
     raise CorpusError(
         "could not locate the corpus: no parent directory contains both catalog.json and "
-        "snippets/. Set ART_BIN_ROOT to the repository root."
+        "snippets/, and this install ships no bundled copy. Set ART_BIN_ROOT to the "
+        "repository root."
     )
 
 
