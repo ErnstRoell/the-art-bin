@@ -1,6 +1,6 @@
 # Test and validation entry points for The Art Bin.
 #
-# JOBS sets the workers for the parallel targets. The suite is 27 read-only
+# JOBS sets the workers for the parallel targets. The suite is 38 read-only
 # tests, 7 of which each spawn their own stdio server subprocess, so they
 # parallelise cleanly. Measured on a 24-core box: 3.8s serial, 1.9s at 4-8
 # workers, 2.5s at `auto` (24) -- past 8 the worker startup cost outweighs
@@ -46,7 +46,22 @@ catalog: ## Regenerate catalog.json from snippets/
 .PHONY: check
 check: validate test ## Validate the corpus, then run the suite (both CI jobs)
 
+# The wheel carries a copy of the corpus (see pyproject force-include), so the installed
+# binary serves a snapshot taken at build time rather than reading this checkout. Run
+# `make catalog` first if you have added smells, or the snapshot ships a stale catalog.
+.PHONY: build
+build: ## Build the wheel and sdist into dist/
+	uv build
+
+.PHONY: install-tool
+install-tool: ## Install art-bin-server on PATH as a standalone tool
+	uv tool install --force .
+
+.PHONY: uninstall-tool
+uninstall-tool: ## Remove the installed art-bin-server tool
+	uv tool uninstall art-bin-server
+
 .PHONY: clean
-clean: ## Remove pytest and bytecode caches
-	rm -rf .pytest_cache
+clean: ## Remove build artifacts, pytest and bytecode caches
+	rm -rf .pytest_cache dist
 	find src tests -name __pycache__ -type d -exec rm -rf {} +
