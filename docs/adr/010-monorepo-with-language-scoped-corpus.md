@@ -23,7 +23,9 @@ the only language planned, but the project is not inherently Python-specific and
 
 ## Decision
 
-One repository containing both `snippets/` and `server/`.
+One repository containing both `snippets/` and `server/`. (The server was later flattened into the repository
+root as a standard `src/` layout, so the package lives at `src/art_bin_server/` and its `pyproject.toml` is the
+root one. That changes where the code sits, not the one-repository decision here.)
 
 Corpus files live at `snippets/<language>/<slug>.md`, so Python content starts at `snippets/python/`. Each file
 also carries a `language` field, making it self-describing outside its directory. ([ADR 011](./011-architecture-group-with-a-larger-ceiling.md)
@@ -33,8 +35,8 @@ later inserted a group directory below the language, leaving the language-scopin
 
 - Schema changes are atomic: "add a field" and "teach the server the field" are one commit. This matters most
   now, while the schema is still moving, and matters less as it settles.
-- A contributor adding one markdown file sees a `server/` directory they have no reason to touch. Acceptable
-  friction; `CONTRIBUTING.md` should point straight at `snippets/python/` and `TEMPLATE.md`.
+- A contributor adding one markdown file sees server code and a `pyproject.toml` they have no reason to touch.
+  Acceptable friction; `CONTRIBUTING.md` should point straight at `snippets/python/` and `TEMPLATE.md`.
 - Adding a second language is a new directory, not a migration of every path. One directory of cost today buys
   that.
 - The `language` field is redundant with the path. Kept deliberately, so an extracted or transmitted record

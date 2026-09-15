@@ -54,4 +54,4 @@ Thumbs.db
 
 # Deliberately NOT ignored:
 #   catalog.json  — a generated artifact that is committed on purpose (docs/adr/007)
-#   uv.lock       — commit it once server/ exists, as it is an application
+#   uv.lock       — committed, as the server is an application rather than a library
