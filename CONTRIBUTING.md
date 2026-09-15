@@ -71,7 +71,8 @@ be good, because "I dislike this" is unactionable without "write this instead".
 
 ## Rules the validator enforces
 
-Run `uv run validate.py` before opening a pull request. CI runs the same thing, and everything hard-blocks.
+Run `make check` before opening a pull request: it validates the corpus and runs the server test suite. CI runs
+the same two things, and everything hard-blocks. `make help` lists the rest of the targets.
 
 - The `## Smell` block is 15 lines or fewer in `code/`, 40 or fewer in `architecture/`
 - The file sits in a known group directory: `code/` or `architecture/`
