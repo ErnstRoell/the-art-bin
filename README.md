@@ -95,9 +95,13 @@ therefore beats the bundle, so a contributor always reads their own edits. Set `
 
 ```sh
 uv sync
-uv run pytest -q          # 27 tests, including 7 over a real stdio subprocess
+uv run pytest -q          # 38 tests, including 7 over a real stdio subprocess
 uv run art-bin-server     # start on stdio
 ```
+
+`make help` lists the targets, including `make install-tool` to put the binary on PATH and `make build` for
+the wheel. `make catalog` before either, if you have added smells — the wheel bundles the catalog as it
+stands at build time.
 
 `src/art_bin_server/corpus.py` is the reading layer — catalog, record parsing, alias resolution, filters — and
 `src/art_bin_server/server.py` is the tool surface. Frontmatter parsing is deliberately duplicated between
