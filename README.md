@@ -52,9 +52,28 @@ cd the-art-bin
 ./install.sh --config ~/.cursor/mcp.json  # anything else that speaks mcpServers
 ```
 
-It writes the entry, backs up any config it touches, refuses to overwrite an existing server of the same name
-without `--force`, and then starts the server once to confirm it can read the corpus. `--dry-run` shows what it
-would do; `--client print` emits the JSON block for pasting by hand:
+Install it as a tool, which puts `art-bin-server` on your PATH:
+
+```sh
+uv tool install .            # from a clone
+uv tool install git+https://github.com/ErnstRoell/the-art-bin
+```
+
+The wheel bundles the corpus, so the installed server needs no checkout to read from:
+
+```json
+{
+  "mcpServers": {
+    "the-art-bin": {
+      "command": "art-bin-server"
+    }
+  }
+}
+```
+
+An install is a snapshot of the corpus as of that build — `uv tool upgrade art-bin-server` to pick up new
+smells. To serve the corpus live from a clone instead, which is what you want while adding smells, register it
+against the checkout:
 
 ```json
 {
@@ -85,9 +104,10 @@ Callers are expected to work in two phases — one `list_smells` to shortlist, o
 server's `instructions` field states that contract, and the full surface is specified in
 [MCP API Overview](./docs/003-mcp-api-overview.md).
 
-The server finds the corpus by walking up from its own location until it finds a directory containing both
-`catalog.json` and `snippets/`. Set `ART_BIN_ROOT` to point somewhere else — which is what a deployment that
-separates the server from the corpus would do.
+The server finds the corpus in three steps, first match wins: `ART_BIN_ROOT`, then the first directory above
+its own location holding both `catalog.json` and `snippets/`, then the copy bundled into the wheel. A clone
+therefore beats the bundle, so a contributor always reads their own edits. Set `ART_BIN_ROOT` to override both
+— which is what a deployment that separates the server from the corpus would do.
 
 ## Developing the server
 
@@ -96,6 +116,10 @@ uv sync
 uv run pytest -q          # 41 tests, including 7 over a real stdio subprocess
 uv run art-bin-server     # start on stdio
 ```
+
+`make help` lists the targets, including `make install-tool` to put the binary on PATH and `make build` for
+the wheel. `make catalog` before either, if you have added smells — the wheel bundles the catalog as it
+stands at build time.
 
 `src/art_bin_server/corpus.py` is the reading layer — catalog, record parsing, alias resolution, filters — and
 `src/art_bin_server/server.py` is the tool surface. Frontmatter parsing is deliberately duplicated between
