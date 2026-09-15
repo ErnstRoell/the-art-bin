@@ -51,7 +51,11 @@ catalog: ## Regenerate catalog.json from snippets/
 .PHONY: check
 check: validate test ## Validate the corpus, then run the suite (both CI jobs)
 
+# Only the directories that actually exist, so clean stays usable in a stale or
+# half-migrated checkout instead of failing on an absent src/ or tests/.
+CACHE_ROOTS := $(wildcard $(PROJECT)/src $(PROJECT)/tests)
+
 .PHONY: clean
 clean: ## Remove pytest and bytecode caches
 	rm -rf $(PROJECT)/.pytest_cache
-	find $(PROJECT)/src $(PROJECT)/tests -name __pycache__ -type d -exec rm -rf {} +
+	$(if $(CACHE_ROOTS),find $(CACHE_ROOTS) -name __pycache__ -type d -exec rm -rf {} +,@echo "no src/ or tests/ under '$(PROJECT)' -- nothing to clean")
