@@ -31,12 +31,26 @@ time. This makes it addressable.
 | `TAXONOMY.md` | The closed lists a smell is filed against. |
 | `TEMPLATE.md` | Skeleton for a new smell. |
 | `validate.py` | Schema and constraint checks. Runs in CI. |
+| `new_smell.py` | Scaffolds a smell file from the template, with the closed lists as menus. |
+| `install.sh` | Registers the server with an MCP client. |
 | `src/art_bin_server/` | The MCP server. |
 | `tests/` | Tests for the server, run against the real corpus. |
 | `CONTEXT.md` | The project glossary. |
 | `docs/` | Design documents and architecture decision records. |
 
-## Using it
+## Installing
+
+Clone it and run the installer. There is nothing to build — the server launches with `uv run`, which resolves
+its own dependencies the first time a client starts it. You need [uv](https://docs.astral.sh/uv/) and nothing
+else.
+
+```sh
+git clone https://github.com/ErnstRoell/the-art-bin
+cd the-art-bin
+./install.sh                            # Claude Code, user scope
+./install.sh --client desktop           # Claude Desktop, this platform's config
+./install.sh --config ~/.cursor/mcp.json  # anything else that speaks mcpServers
+```
 
 Install it as a tool, which puts `art-bin-server` on your PATH:
 
@@ -72,9 +86,13 @@ against the checkout:
 }
 ```
 
-It exposes three read-only tools and no analysis — nothing here accepts source code, scores anything, or
-decides what matches. The corpus goes to the model; the model does the judging
-([ADR 001](./docs/adr/001-corpus-as-queryable-knowledge-base.md)).
+`./install.sh --help` lists the rest, and `make install-mcp ARGS='...'` is the same thing from the Makefile.
+
+## Using it
+
+Ask your client to review some code. The server exposes three read-only tools and no analysis — nothing here
+accepts source code, scores anything, or decides what matches. The corpus goes to the model; the model does the
+judging ([ADR 001](./docs/adr/001-corpus-as-queryable-knowledge-base.md)).
 
 | Tool | Returns |
 | --- | --- |
@@ -95,7 +113,7 @@ therefore beats the bundle, so a contributor always reads their own edits. Set `
 
 ```sh
 uv sync
-uv run pytest -q          # 38 tests, including 7 over a real stdio subprocess
+uv run pytest -q          # 41 tests, including 7 over a real stdio subprocess
 uv run art-bin-server     # start on stdio
 ```
 
@@ -111,10 +129,20 @@ schema they agree on is [Snippet Design](./docs/002-snippet-design.md).
 ## Adding a smell
 
 ```sh
-cp TEMPLATE.md snippets/python/code/my-new-smell.md
+make new-smell                          # asks for the slug and the filing
+make new-smell SLUG=my-new-smell        # asks only for the filing
 # write it
-uv run validate.py --write-catalog
+make catalog                            # regenerate catalog.json
+make check                              # what CI runs
 ```
+
+The scaffolder fills in the frontmatter you would otherwise get wrong: it offers only the `category` and `topic`
+values `TAXONOMY.md` actually lists, refuses a slug that collides with an existing id or alias, and points out
+existing smells sharing a word with yours so near-duplicates surface before you write one. What it deliberately
+leaves at their template placeholders are `signature`, `distinguish` and `keywords` — the three fields that are
+the actual work. Answer `architecture` at the group prompt for a smell that needs 40 lines, and see
+`uv run new_smell.py --help` for the flags that skip the prompts entirely (`make new-smell` forwards them as
+`ARGS='...'`).
 
 Read [CONTRIBUTING.md](./CONTRIBUTING.md) first — particularly the part about never pasting code from a real
 codebase, and the three fields that need actual thought.

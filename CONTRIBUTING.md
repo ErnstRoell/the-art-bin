@@ -10,17 +10,29 @@ unlicensed code, and a recognisable snippet publishes a colleague's work as an e
 snippet ceiling exists partly to make this easy — no real code is that small, so rebuilding is the only way to
 hit it, in `architecture/` as much as in `code/`.
 
-Check whether the smell is already here. Search `catalog.json` for the mechanism before writing a new file.
+Check whether the smell is already here. Search `catalog.json` for the mechanism before writing a new file —
+`make new-smell` also names any existing smells whose id shares a word with your slug, which catches the
+obvious collisions but not a duplicate filed under different words.
 
 ## Adding a smell
 
-1. Copy `TEMPLATE.md` to `snippets/python/code/<slug>.md`, or to `snippets/python/architecture/<slug>.md`
-   if the smell is one of the few that cannot be shown in 15 lines (see **Groups**).
-2. Name the slug after the smell, not the fix: `mutable-default-argument`, not `use-none-default`.
-3. Fill in the frontmatter. Every field except `aliases` and `source` is required.
+1. Run `make new-smell`. It asks for the slug and the filing, then writes
+   `snippets/python/<group>/<slug>.md` from `TEMPLATE.md`. Answer `architecture` for the group only if the
+   smell is one of the few that cannot be shown in 15 lines (see **Groups**).
+2. Name the slug after the smell, not the fix: `mutable-default-argument`, not `use-none-default`. The
+   scaffolder refuses a slug that is already an id or an alias, and lists existing smells sharing a word with
+   yours — read those before writing, since a near-duplicate is worth less than an alias on the entry that
+   already exists.
+3. Finish the frontmatter. The scaffolder fills in the filing and leaves `signature`, `distinguish` and
+   `keywords`, which are the three fields that need thought. Every field except `aliases` and `source` is
+   required.
 4. Write the three body sections: `## Smell`, `## Why it's bad`, `## Better`.
-5. Regenerate the catalog: `uv run validate.py --write-catalog`.
+5. Regenerate the catalog: `make catalog`.
 6. Commit both your snippet and the updated `catalog.json`.
+
+Scaffolding by hand is fine too — `cp TEMPLATE.md snippets/python/code/<slug>.md` and fill it in. The
+scaffolder is a convenience over the closed lists, not a required step; `uv run new_smell.py --help` covers the
+flags that skip the prompts, which is what you want when adding several at once.
 
 ## Groups
 

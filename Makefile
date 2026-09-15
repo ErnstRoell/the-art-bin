@@ -1,12 +1,17 @@
-# Test and validation entry points for The Art Bin.
+# Entry points for The Art Bin: install the server, add a smell, run the checks.
 #
 # JOBS sets the workers for the parallel targets. The suite is 38 read-only
 # tests, 7 of which each spawn their own stdio server subprocess, so they
 # parallelise cleanly. Measured on a 24-core box: 3.8s serial, 1.9s at 4-8
 # workers, 2.5s at `auto` (24) -- past 8 the worker startup cost outweighs
 # the suite.
+#
+# ARGS is forwarded to install-mcp and new-smell, both of which are thin
+# wrappers over a script with its own --help.
 JOBS        ?= 8
 PYTEST_ARGS ?=
+ARGS        ?=
+SLUG        ?=
 
 .DEFAULT_GOAL := help
 
@@ -18,6 +23,14 @@ help: ## Show this help
 .PHONY: install
 install: ## Sync the dev environment (pytest, pytest-asyncio)
 	uv sync
+
+.PHONY: install-mcp
+install-mcp: ## Register the MCP server with a client (ARGS='--client desktop', --help for more)
+	./install.sh $(ARGS)
+
+.PHONY: new-smell
+new-smell: ## Scaffold a new smell (SLUG=my-smell, or no SLUG to be asked for everything)
+	uv run new_smell.py $(SLUG) $(ARGS)
 
 .PHONY: test
 test: ## Run the whole suite serially (what CI runs)
