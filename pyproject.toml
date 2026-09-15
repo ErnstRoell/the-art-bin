@@ -21,6 +21,13 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/art_bin_server"]
 
+# The corpus sits at the repo root, outside the package, so a wheel built from `packages`
+# alone ships the server without the data it serves. Bundle a copy beside the module;
+# corpus.find_root falls back to it when the install has no checkout above it.
+[tool.hatch.build.targets.wheel.force-include]
+"catalog.json" = "art_bin_server/_corpus/catalog.json"
+"snippets" = "art_bin_server/_corpus/snippets"
+
 [dependency-groups]
 dev = ["pytest>=8", "pytest-asyncio>=0.24"]
 
