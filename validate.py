@@ -105,7 +105,10 @@ RUSTC = shutil.which("rustc")
 # Snippets lean on tokio, serde, log and friends and, like Python ones, only have to parse.
 # Everything rustc says after parsing — unresolved crates, macros, attributes, files named by
 # #[path] or include!, type errors — is about what the snippet leaves out, not whether it is Rust.
-NOT_A_PARSE_ERROR = re.compile(r"^error(\[E\d+\]: |: cannot find |: couldn't read |: aborting )")
+# rustc 1.98: "couldn't read `path`: ..."; rustc 1.99: "couldn't find file `path`".
+NOT_A_PARSE_ERROR = re.compile(
+    r"^error(\[E\d+\]: |: cannot find |: couldn't read |: couldn't find file |: aborting )"
+)
 
 
 def rust_parse_error(code: str) -> str | None:
