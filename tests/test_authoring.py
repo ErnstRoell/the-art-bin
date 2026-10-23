@@ -101,6 +101,12 @@ def test_rust_parse_check_ignores_missing_dependencies_only() -> None:
     assert validate.rust_parse_error("let x = 1;\nlet y = x + 1;") is None
     assert validate.rust_parse_error("let x = ;") is not None
     assert validate.rust_parse_error("fn f( {") is not None
+    assert validate.rust_parse_error('#[path = "../../shared/src/money.rs"]\nmod money;') is None
+    for line in (
+        "error: couldn't read `../../shared/src/money.rs`: No such file or directory (os error 2)",
+        "error: couldn't find file `../../shared/src/money.rs`",
+    ):
+        assert validate.NOT_A_PARSE_ERROR.match(line)
 
 
 def test_typescript_parse_check_ignores_missing_dependencies_only() -> None:
