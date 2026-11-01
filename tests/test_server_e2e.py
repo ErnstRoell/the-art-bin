@@ -96,6 +96,10 @@ async def test_language_filter_over_the_wire() -> None:
         assert py_catalog["count"] > 0
         assert all(s["language"] == "python" for s in py_catalog["smells"])
 
+        ts_catalog = payload(await client.call_tool("list_smells", {"language": "typescript"}))
+        assert ts_catalog["count"] > 0
+        assert all(s["language"] == "typescript" for s in ts_catalog["smells"])
+
         rust_smell = rust_catalog["smells"][0]["id"]
         records = payload(await client.call_tool("get_smells", {"ids": [rust_smell]}))
         assert records["smells"][0]["language"] == "rust"

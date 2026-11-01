@@ -15,7 +15,7 @@ related:
 
 # System Overview
 
-The Art Bin is a curated corpus of bad Python and Rust code. Each file describes one **smell** — a single named way that
+The Art Bin is a curated corpus of bad Python, Rust and TypeScript code. Each file describes one **smell** — a single named way that
 code goes wrong — small enough to read at a glance and structured enough for a machine to work with. An MCP
 server exposes the corpus so that an LLM reviewing a real codebase can ask "does anything here resemble a known
 smell?" and get back specific, opinionated answers rather than generic advice.
@@ -36,9 +36,9 @@ knowledge base rather than a style guide.
 
 ### The Corpus
 
-A directory of markdown files, one per smell, at `snippets/<language>/<group>/<slug>.md`. Python and Rust are the
-languages today; the path carries the language, so adding one is a new directory rather than a migration
-([ADR 012](./adr/012-rust-as-a-second-language.md)). The group is `code` or `architecture`, and selects only the snippet size ceiling
+A directory of markdown files, one per smell, at `snippets/<language>/<group>/<slug>.md`. Python, Rust and
+TypeScript are the languages today; the path carries the language, so adding one is a new directory rather than a migration
+([ADR 012](./adr/012-rust-as-a-second-language.md), [ADR 013](./adr/013-typescript-as-a-third-language.md)). The group is `code` or `architecture`, and selects only the snippet size ceiling
 ([ADR 011](./adr/011-architecture-group-with-a-larger-ceiling.md)).
 Each file holds YAML frontmatter (the machine-readable part) and a short body: the offending snippet, why it is
 bad, and the corrected version. The corpus is the source of truth and the actual product — everything else is
@@ -123,6 +123,7 @@ metadata search over the existing fields — not embeddings.
 │   └── adr/
 ├── snippets/
 │   ├── rust/               # laid out like python/
+│   ├── typescript/         # laid out like python/
 │   └── python/
 │       ├── code/           # 15-line ceiling
 │       │   └── <slug>.md

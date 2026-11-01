@@ -53,9 +53,10 @@ prompt at current and projected size.
 | `severity` | `string[]` | Restrict to `bug`, `trap`, and/or `taste` |
 | `category` | `string[]` | Restrict to consequence categories |
 | `topic` | `string[]` | Restrict to language-feature topics |
-| `language` | `string` | `python` or `rust`; omit for both |
+| `language` | `string` | `python`, `rust` or `typescript`; omit for all |
 | `python_version` | `string` | Return only Python smells whose `python` range includes this version |
 | `rust_version` | `string` | Return only Rust smells whose `rust` range includes this toolchain version, e.g. `1.80` |
+| `typescript_version` | `string` | Return only TypeScript smells whose `typescript` range includes this compiler version, e.g. `5.4` |
 
 **Response**
 

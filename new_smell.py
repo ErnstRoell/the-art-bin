@@ -48,7 +48,7 @@ ROOT = Path(__file__).parent
 TEMPLATE = ROOT / "TEMPLATE.md"
 DEFAULT_LANGUAGE = "python"
 # Per language: the comment prefix for the placeholder code, and the default version range.
-SCAFFOLD = {"python": ("#", ">=3.0"), "rust": ("//", ">=1.0")}
+SCAFFOLD = {"python": ("#", ">=3.0"), "rust": ("//", ">=1.0"), "typescript": ("//", ">=3.0")}
 H1_RE = re.compile(r"^# .+$", re.MULTILINE)
 
 # Words too common to say anything about whether two slugs describe the same smell.

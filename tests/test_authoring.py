@@ -109,6 +109,15 @@ def test_rust_parse_check_ignores_missing_dependencies_only() -> None:
         assert validate.NOT_A_PARSE_ERROR.match(line)
 
 
+def test_typescript_parse_check_ignores_missing_dependencies_only() -> None:
+    """Imports and types need not resolve, JSX must parse, and broken syntax must not."""
+    assert validate.typescript_parse_error('import { db } from "./db";\nconst n: number = "s";\nawait db.q();') is None
+    assert validate.typescript_parse_error("const el = <li key={i}>{name}</li>;") is None
+    assert validate.typescript_parse_error("const n = <number>value;") is None
+    assert validate.typescript_parse_error("let x = ;") is not None
+    assert validate.typescript_parse_error("function f( {") is not None
+
+
 def test_scaffold_keeps_the_template_body(scaffold) -> None:
     run_new_smell("another-smell", "--severity", "bug", "--category", "correctness", "--topic", "io")
     text = (scaffold / "another-smell.md").read_text(encoding="utf-8")

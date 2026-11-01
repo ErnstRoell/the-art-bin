@@ -1,6 +1,6 @@
 # The Art Bin
 
-A curated corpus of bad Python and Rust code, one specimen per file, structured so a machine
+A curated corpus of bad Python, Rust and TypeScript code, one specimen per file, structured so a machine
 can find the ones a real codebase resembles.
 
 ## Language

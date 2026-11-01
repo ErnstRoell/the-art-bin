@@ -41,6 +41,7 @@ RECORD_FIELDS = (
     "language",
     "python",
     "rust",
+    "typescript",
     "added",
     "source",
 )
@@ -228,6 +229,7 @@ class Corpus:
         language: str | None = None,
         python_version: str | None = None,
         rust_version: str | None = None,
+        typescript_version: str | None = None,
     ) -> dict[str, Any]:
         catalog = self.catalog()
         smells = catalog.get("smells", [])
@@ -242,7 +244,7 @@ class Corpus:
 
         # A version names one language, so giving any restricts the catalog to the languages
         # that have one; each smell is then checked against its own language's range.
-        versions = {"python": python_version, "rust": rust_version}
+        versions = {"python": python_version, "rust": rust_version, "typescript": typescript_version}
         if any(versions.values()):
             keep = []
             for smell in smells:

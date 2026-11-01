@@ -92,9 +92,9 @@ def test_filters_narrow_the_catalog(corpus: Corpus) -> None:
     assert corpus.list_smells(language="ruby")["count"] == 0
     assert corpus.list_smells(language="rust")["count"] > 0
     assert corpus.list_smells(language="python")["count"] > 0
-    assert (
-        corpus.list_smells(language="rust")["count"] + corpus.list_smells(language="python")["count"]
-        == len(smells)
+    assert corpus.list_smells(language="typescript")["count"] > 0
+    assert sum(corpus.list_smells(language=lang)["count"] for lang in ("python", "rust", "typescript")) == len(
+        smells
     )
 
 
@@ -113,6 +113,15 @@ def test_rust_version_filter_uses_the_rust_range(corpus: Corpus) -> None:
     assert "trim-matches-used-to-remove-one-suffix" not in {smell["id"] for smell in old}
     assert "trim-matches-used-to-remove-one-suffix" in {smell["id"] for smell in new}
     assert {smell["language"] for smell in new} == {"rust"}
+
+
+def test_typescript_version_filter_uses_the_typescript_range(corpus: Corpus) -> None:
+    """satisfies-operator-avoided-with-an-annotation is >=4.9, since satisfies landed in 4.9."""
+    old = corpus.list_smells(typescript_version="4.8")["smells"]
+    new = corpus.list_smells(typescript_version="5.4")["smells"]
+    assert "satisfies-operator-avoided-with-an-annotation" not in {smell["id"] for smell in old}
+    assert "satisfies-operator-avoided-with-an-annotation" in {smell["id"] for smell in new}
+    assert {smell["language"] for smell in new} == {"typescript"}
 
 
 def test_both_version_filters_keep_both_languages(corpus: Corpus) -> None:

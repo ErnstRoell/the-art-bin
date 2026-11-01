@@ -12,7 +12,7 @@ if not this_is_true:
 
 ## What this is
 
-A corpus of bad Python and Rust code, one **smell** per file, structured so a machine can find the ones your codebase
+A corpus of bad Python, Rust and TypeScript code, one **smell** per file, structured so a machine can find the ones your codebase
 resembles. An MCP server serves the corpus to an LLM reviewing real code, so instead of generic advice you get
 "line 42 is `mutable-default-argument`, here is why, here is what to write instead."
 
@@ -25,7 +25,7 @@ time. This makes it addressable.
 
 | Path | What it is |
 | --- | --- |
-| `snippets/<language>/code/` | The corpus, for `python` and `rust`. One smell per file, 15 lines or fewer. |
+| `snippets/<language>/code/` | The corpus, for `python`, `rust` and `typescript` (which covers plain JavaScript too). One smell per file, 15 lines or fewer. |
 | `snippets/<language>/architecture/` | Smells that live between components, where 15 lines cannot show the problem. One entry per Gang of Four pattern, describing the code the pattern answers. |
 | `catalog.json` | Generated summary of every smell, small enough to read whole. |
 | `TAXONOMY.md` | The closed lists a smell is filed against. |
@@ -96,7 +96,7 @@ judging ([ADR 001](./docs/adr/001-corpus-as-queryable-knowledge-base.md)).
 
 | Tool | Returns |
 | --- | --- |
-| `list_smells` | The whole catalog: id, signature, severity, category, topic, tags, keywords. Optional filters for severity, category, topic, language, `python_version` and `rust_version`. |
+| `list_smells` | The whole catalog: id, signature, severity, category, topic, tags, keywords. Optional filters for severity, category, topic, language, `python_version`, `rust_version` and `typescript_version`. |
 | `get_smells` | Full records for specific ids: snippet, why it's bad, corrected version, and `distinguish`. Aliases resolve; unknown ids come back in `unknown`. |
 | `get_taxonomy` | The closed lists with corpus counts, for building valid filters. |
 

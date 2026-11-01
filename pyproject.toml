@@ -1,7 +1,7 @@
 [project]
 name = "art-bin-server"
 version = "0.1.0"
-description = "MCP server exposing The Art Bin corpus of Python code smells"
+description = "MCP server exposing The Art Bin corpus of Python, Rust and TypeScript code smells"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"

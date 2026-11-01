@@ -38,7 +38,7 @@ SEVERITIES = ("bug", "trap", "taste")
 SLUG_RE = re.compile(r"^[a-z0-9-]+$")
 
 # Each language's version range lives in a field named after it: `python: ">=3.9"`, `rust: ">=1.70"`.
-LANGUAGES = ("python", "rust")
+LANGUAGES = ("python", "rust", "typescript")
 REQUIRED = (
     "language",
     "severity",
@@ -134,6 +134,41 @@ def rust_parse_error(code: str) -> str | None:
         found.append(errors[0])
     # Statements fail at crate level with "expected item", so report the body's error instead.
     return found[1] if "expected item" in found[0] else found[0]
+
+
+TSC = shutil.which("tsc")
+# Only the parser's own diagnostics count, the counterpart of ast.parse: unresolved imports and
+# type errors are about what the snippet leaves out. A block that fails as .ts is retried as .tsx,
+# so React snippets pass without a fence tag of their own.
+TS_PARSE = """
+const ts = require(process.argv[1]);
+const code = require("fs").readFileSync(0, "utf8");
+let first;
+for (const kind of [ts.ScriptKind.TS, ts.ScriptKind.TSX]) {
+  const file = ts.createSourceFile("snippet", code, ts.ScriptTarget.Latest, false, kind);
+  const [diag] = file.parseDiagnostics;
+  if (!diag) process.exit(0);
+  if (!first) {
+    const { line } = file.getLineAndCharacterOfPosition(diag.start);
+    first = `${ts.flattenDiagnosticMessageText(diag.messageText, " ")} (line ${line + 1})`;
+  }
+}
+console.log(first);
+process.exit(1);
+"""
+
+
+def typescript_parse_error(code: str) -> str | None:
+    """None when the code parses as TypeScript, or as TSX."""
+    node = shutil.which("node")
+    if TSC is None or node is None:
+        return "tsc not found; install TypeScript (npm install -g typescript) to validate TypeScript snippets"
+    # tsc is <package>/bin/tsc, usually behind a symlink; the compiler API is <package>/lib/typescript.js.
+    compiler = Path(TSC).resolve().parent.parent / "lib" / "typescript.js"
+    result = subprocess.run([node, "-e", TS_PARSE, str(compiler)], input=code, capture_output=True, text=True)
+    if result.returncode == 0:
+        return None
+    return result.stdout.strip() or result.stderr.strip().splitlines()[-1]
 
 
 def is_one_sentence(text: str) -> bool:
@@ -238,6 +273,8 @@ def check_file(path: Path, taxonomy: dict[str, set[str]], errors: Errors) -> dic
             except SyntaxError as exc:
                 errors.add(where, name, f"does not parse: {exc.msg} (line {exc.lineno})")
         elif language == "rust" and (message := rust_parse_error(code)):
+            errors.add(where, name, f"does not parse: {message}")
+        elif language == "typescript" and (message := typescript_parse_error(code)):
             errors.add(where, name, f"does not parse: {message}")
 
     if not sections.get("Why it's bad", "").strip():

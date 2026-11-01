@@ -17,7 +17,7 @@ obvious collisions but not a duplicate filed under different words.
 ## Adding a smell
 
 1. Run `make new-smell`. It asks for the slug and the filing, then writes
-   `snippets/<language>/<group>/<slug>.md` from `TEMPLATE.md` (`ARGS="--language rust"` for Rust, which
+   `snippets/<language>/<group>/<slug>.md` from `TEMPLATE.md` (`ARGS="--language rust"` for Rust, `--language typescript` for TypeScript, which
    converts the template's version field and code fences for you). Answer `architecture` for the group only if the
    smell is one of the few that cannot be shown in 15 lines (see **Groups**).
 2. Name the slug after the smell, not the fix: `mutable-default-argument`, not `use-none-default`. The
@@ -89,7 +89,8 @@ the same two things, and everything hard-blocks. `make help` lists the rest of t
 
 - The `## Smell` block is 15 lines or fewer in `code/`, 40 or fewer in `architecture/`
 - The file sits in a known group directory: `code/` or `architecture/`
-- Both code blocks parse under `ast.parse` — they need not run, and `...` is fine
+- Both code blocks parse — `ast.parse` for Python, `rustc` for Rust, the `tsc` parser for TypeScript. They need
+  not run, and `...` is fine
 - `category` and `topic` are values listed in `TAXONOMY.md`
 - `signature` and `distinguish` are each a single sentence ending in a period
 - The filename matches `[a-z0-9-]+`, and no alias collides with any other slug or alias
