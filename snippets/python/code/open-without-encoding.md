@@ -25,7 +25,7 @@ def read_config(path):
 
 ## Why it's bad
 
-- Without `encoding=`, Python uses `locale.getpreferredencoding()`, which is UTF-8 on most Linux machines and
+- Without `encoding=`, Python uses the locale encoding (`locale.getencoding()`), which is UTF-8 on most Linux machines and
   historically cp1252 on Windows, so the same file parses differently on two developers' laptops.
 - The failure is content-dependent: files of pure ASCII behave identically everywhere, so the bug appears only
   once a name contains an accent or a dash that is not the ASCII hyphen.

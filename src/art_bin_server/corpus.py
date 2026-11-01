@@ -150,6 +150,36 @@ def parse_record(path: Path) -> dict[str, Any]:
     return record
 
 
+CELL_SPLIT_RE = re.compile(r"(?<!\\)\|")
+SLUG_LINK_RE = re.compile(r"\[([a-z0-9-]+)\]\(")
+LINK_RE = re.compile(r"\[([^\]]+)\]\((\S+?)\)")
+
+
+def parse_sources(text: str) -> dict[str, list[dict[str, str | None]]]:
+    """Map slug -> the rows of a docs/<language>-sources.md table (see docs/sources.md).
+
+    A Source cell is a markdown link, or plain text for a book or ``house taste``, which
+    leaves ``url`` as None.
+    """
+    rows: dict[str, list[dict[str, str | None]]] = {}
+    for line in text.splitlines():
+        if not line.startswith("|"):
+            continue
+        cells = [cell.strip().replace("\\|", "|") for cell in CELL_SPLIT_RE.split(line.strip().strip("|"))]
+        if len(cells) != 4 or not (slug := SLUG_LINK_RE.match(cells[0])):
+            continue
+        link = LINK_RE.fullmatch(cells[2])
+        rows.setdefault(slug.group(1), []).append(
+            {
+                "claim": cells[1],
+                "source": link.group(1) if link else cells[2],
+                "url": link.group(2) if link else None,
+                "passage": cells[3],
+            }
+        )
+    return rows
+
+
 def _matches_version(spec: str | None, version: str) -> bool:
     """True when ``version`` satisfies a smell's version range. Unparseable ranges match."""
     if not spec:
@@ -169,6 +199,7 @@ class Corpus:
     def __post_init__(self) -> None:
         self._records: dict[str, tuple[float, dict[str, Any]]] = {}
         self._aliases: dict[str, str] | None = None
+        self._sources: dict[str, tuple[float, dict[str, list[dict[str, str | None]]]]] = {}
 
     @classmethod
     def discover(cls) -> Corpus:
@@ -208,7 +239,21 @@ class Corpus:
         cached = self._records.get(slug)
         if cached is None or cached[0] != mtime:
             self._records[slug] = (mtime, parse_record(path))
-        return dict(self._records[slug][1])
+        record = dict(self._records[slug][1])
+        record["sources"] = self.sources(record.get("language")).get(slug, [])
+        return record
+
+    def sources(self, language: str | None) -> dict[str, list[dict[str, str | None]]]:
+        """One language's sources page, parsed and cached by mtime. Missing page -> no rows."""
+        path = self.root / "docs" / f"{language}-sources.md"
+        try:
+            mtime = path.stat().st_mtime
+        except OSError:
+            return {}
+        cached = self._sources.get(str(language))
+        if cached is None or cached[0] != mtime:
+            self._sources[str(language)] = (mtime, parse_sources(path.read_text(encoding="utf-8")))
+        return self._sources[str(language)][1]
 
     def alias_index(self) -> dict[str, str]:
         """Map alias -> canonical slug. Built on first miss, since aliases are not in the catalog."""

@@ -28,8 +28,11 @@ obvious collisions but not a duplicate filed under different words.
    `keywords`, which are the three fields that need thought. Every field except `aliases` and `source` is
    required.
 4. Write the three body sections: `## Smell`, `## Why it's bad`, `## Better`.
-5. Regenerate the catalog: `make catalog`.
-6. Commit both your snippet and the updated `catalog.json`.
+5. Add your smell's rows to `docs/<language>-sources.md`: for each claim a reader might doubt, a link that lands
+   on the passage stating it and a verbatim quote of that passage. A claim no source states gets cut, or, for a
+   style preference, marked `house taste`. [docs/sources.md](./docs/sources.md) describes the format.
+6. Regenerate the catalog: `make catalog`.
+7. Commit your snippet, its sources rows and the updated `catalog.json`.
 
 Scaffolding by hand is fine too — `cp TEMPLATE.md snippets/python/code/<slug>.md` and fill it in. The
 scaffolder is a convenience over the closed lists, not a required step; `uv run new_smell.py --help` covers the

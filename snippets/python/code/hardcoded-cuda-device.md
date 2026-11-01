@@ -28,8 +28,9 @@ def embed(model, batch):
 
 - The function will not run on a machine without a GPU, so nobody can execute the test suite on a laptop and
   CI has to be given hardware it does not need.
-- `"cuda"` means device zero, so on a multi-GPU host every call lands on the same card no matter what the
-  caller arranged, and two parallel jobs fight over it.
+- `"cuda"` means whichever device is current, which is device zero unless something called
+  `torch.cuda.set_device`, so on a multi-GPU host every call lands on that one card regardless of where the
+  caller's tensors live, and two parallel jobs that never set a device fight over it.
 - The device is a property of the run, not of this function, so hardcoding it removes the one decision the
   caller actually needs to make while leaving the function no less complicated.
 - It presents as a `RuntimeError` about tensors on different devices, raised somewhere downstream, once one

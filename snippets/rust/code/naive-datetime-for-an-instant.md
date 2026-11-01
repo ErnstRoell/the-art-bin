@@ -34,7 +34,8 @@ pub fn record(action: &str) -> AuditEntry {
   local. Two servers in different zones write entries that sort in the wrong order.
 - Around a daylight-saving change the same local hour happens twice, so the log cannot say which of two
   instants an entry belongs to.
-- Serialised to JSON or a database it looks like UTC, and every consumer decides for itself whether it is.
+- Serialised to JSON or a database it carries no offset, so every consumer decides for itself which zone it
+  was in, and many guess UTC.
 
 ## Better
 

@@ -29,8 +29,8 @@ use money::Money;
 
 - Each crate compiles its own copy of `money.rs`, so `api::money::Money` and `worker::money::Money` are two
   unrelated types. Passing one where the other is expected fails with "expected `Money`, found `Money`".
-- Cargo does not know the file exists, so editing it does not show up as a change to a dependency, and tools
-  that work per crate see it as an orphan.
+- Cargo sees no dependency between the crates, so `cargo tree`, publishing and per-package tooling know
+  nothing about the shared code.
 - The shared file's own imports resolve relative to whichever crate includes it, so it quietly depends on
   both crates having the same dependencies and module layout.
 

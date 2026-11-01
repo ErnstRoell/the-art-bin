@@ -106,6 +106,8 @@ def test_wheel_bundles_the_corpus(tmp_path: Path) -> None:
         for p in (REPO_ROOT / "snippets").glob("*/*/*.md")
     }
     assert on_disk and on_disk <= bundled
+    for page in (REPO_ROOT / "docs").glob("*-sources.md"):
+        assert f"art_bin_server/_corpus/docs/{page.name}" in names
 
 
 @pytest.mark.skipif(shutil.which("uv") is None, reason="needs uv to build a wheel")

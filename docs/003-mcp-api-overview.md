@@ -127,7 +127,15 @@ Returns full records for specific smells. Batched, because phase two fetches a h
         "The list is created once, at definition time, and outlives the call.",
         "Callers who omit `basket` silently share state with every previous caller."
       ],
-      "better": "def add_item(item, basket=None):\n    basket = [] if basket is None else basket\n    basket.append(item)\n    return basket"
+      "better": "def add_item(item, basket=None):\n    basket = [] if basket is None else basket\n    basket.append(item)\n    return basket",
+      "sources": [
+        {
+          "claim": "the default is created once, at definition, not per call",
+          "source": "Python Tutorial: 4.9.1 Default Argument Values",
+          "url": "https://docs.python.org/3/tutorial/controlflow.html#default-argument-values",
+          "passage": "\"Important warning: The default value is evaluated only once. ...\""
+        }
+      ]
     }
   ],
   "unknown": ["not-a-real-slug"]
@@ -138,6 +146,11 @@ Unknown identifiers are reported in `unknown` rather than raising. A partial ans
 mid-review than a failed call, and a hallucinated slug should not discard the valid ones alongside it. When an
 alias was used, `resolved_from` carries the alias and `id` carries the canonical slug, so anything the model
 cites afterwards is the current identifier.
+
+`sources` holds the entry's rows from `docs/<language>-sources.md` ([docs/sources.md](./sources.md)): one per
+claim, with a `url` that lands on the passage stating it and the passage quoted. `url` is null for a book cited
+without a link and for `house taste` rows. A model that has to defend a finding links the row, rather than
+asserting the claim on the corpus's authority.
 
 ### `get_taxonomy`
 

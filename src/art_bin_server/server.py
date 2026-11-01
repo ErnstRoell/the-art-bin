@@ -30,7 +30,9 @@ the few smells that might plausibly apply. Do not guess smell ids. Use the `lang
 anything — it describes the legitimate variant that merely resembles the smell, and it is \
 the guard against flagging correct code.
 
-Cite the smell `id` in every finding so a reader can go read the entry. Respect `severity`: \
+Cite the smell `id` in every finding so a reader can go read the entry. When a finding rests on \
+a claim someone may doubt, link the matching `sources` row: its `url` lands on the passage that \
+states the claim. Respect `severity`: \
 `taste` is a house-style preference and should be reported as one, not as a bug.\
 """
 
@@ -102,7 +104,9 @@ def build_server(corpus: Corpus | None = None) -> MCPServer:
         description=(
             "Return full records for specific smells: the offending snippet, why it is "
             "bad, the corrected version, and the `distinguish` line describing the near "
-            "miss that is NOT this smell. Read `distinguish` before reporting a finding. "
+            "miss that is NOT this smell, and `sources`: each claim the entry makes, with "
+            "a link to the published passage that states it and a quote of that passage. "
+            "Read `distinguish` before reporting a finding. "
             "Accepts slugs or aliases; unrecognised ids come back in `unknown` rather "
             "than failing the call."
         ),

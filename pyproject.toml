@@ -27,6 +27,8 @@ packages = ["src/art_bin_server"]
 [tool.hatch.build.targets.wheel.force-include]
 "catalog.json" = "art_bin_server/_corpus/catalog.json"
 "snippets" = "art_bin_server/_corpus/snippets"
+# get_smells attaches each entry's rows from docs/<language>-sources.md.
+"docs" = "art_bin_server/_corpus/docs"
 
 [dependency-groups]
 dev = ["pytest>=8", "pytest-asyncio>=0.24"]

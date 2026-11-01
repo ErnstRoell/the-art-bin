@@ -46,6 +46,7 @@ const EMAIL = /^[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*@example\.com$/;
 
 app.post("/signup", (req, res) => {
   const email = String(req.body.email);
+  // 254 is the longest address SMTP can carry (RFC 5321 4.5.3.1.3, RFC 3696 erratum 1690)
   if (email.length > 254 || !EMAIL.test(email)) {
     return res.status(400).send("invalid email");
   }

@@ -37,8 +37,8 @@ def train(model):
   handler, and require a GPU — all as a consequence of the word `import`.
 - Import order becomes semantically significant. Whoever imports first wins the logging configuration, and any
   module imported afterwards that reseeds will silently undo this one.
-- `torch.device("cuda")` runs before anything can decide whether a GPU exists, so importing the module for a
-  docstring or a type annotation fails on a laptop.
+- `torch.device("cuda")` fixes the device at import, before any caller can check whether a GPU exists, so on a
+  laptop the module fails at the first `.to(DEVICE)`, far from the line that made the choice.
 - It presents as behaviour that changes when an unrelated import is added or reordered, and as a test suite
   whose logging output depends on which test file was collected first.
 

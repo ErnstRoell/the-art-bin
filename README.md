@@ -97,7 +97,7 @@ judging ([ADR 001](./docs/adr/001-corpus-as-queryable-knowledge-base.md)).
 | Tool | Returns |
 | --- | --- |
 | `list_smells` | The whole catalog: id, signature, severity, category, topic, tags, keywords. Optional filters for severity, category, topic, language, `python_version`, `rust_version` and `typescript_version`. |
-| `get_smells` | Full records for specific ids: snippet, why it's bad, corrected version, and `distinguish`. Aliases resolve; unknown ids come back in `unknown`. |
+| `get_smells` | Full records for specific ids: snippet, why it's bad, corrected version, `distinguish`, and `sources` (each claim linked to the passage that states it). Aliases resolve; unknown ids come back in `unknown`. |
 | `get_taxonomy` | The closed lists with corpus counts, for building valid filters. |
 
 Callers are expected to work in two phases — one `list_smells` to shortlist, one `get_smells` to confirm. The

@@ -36,7 +36,7 @@ export class StringUtils {
 - The module is already the namespace; the class adds a second one, a type that can be `new`ed to no purpose,
   and a `StringUtils.` prefix at every call site.
 - typescript-eslint's `no-extraneous-class` notes that static members are harder to autocomplete, harder to
-  check for unused members, and do not tree-shake as well as individual exports.
+  check for unused members than individual exports.
 - The Google TypeScript Style Guide says not to create container classes with static methods or properties
   for the sake of namespacing.
 

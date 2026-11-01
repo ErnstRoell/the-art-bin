@@ -32,8 +32,8 @@ def accuracy(model, loader):
   than the truth and different on every call.
 - Batch norm layers are still in training mode, so this pass *updates the running statistics* using the
   validation set — the evaluation has now modified the model and leaked the held-out distribution into it.
-- Without `no_grad` every forward also builds a graph that is never used, roughly doubling memory for no
-  purpose, which is often what forces the batch size down.
+- Without `no_grad` every forward also records a graph that is never used, keeping activations alive and
+  costing memory for no purpose, which is often what forces the batch size down.
 - It presents as a validation number that is noisy and pessimistic, and as a model that scores differently
   after evaluation than before it, which reads as nondeterminism rather than as a missing method call.
 

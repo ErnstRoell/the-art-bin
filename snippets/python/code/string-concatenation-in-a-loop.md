@@ -28,8 +28,8 @@ def render(rows):
 ## Why it's bad
 
 - Strings are immutable, so each iteration builds a new object and copies everything accumulated so far.
-- CPython has an in-place optimisation that hides the cost, and it silently stops applying as soon as anything
-  else holds a reference to the string, so performance depends on details far from this loop.
+- CPython has an in-place optimisation that can hide the cost, but it is fragile even in CPython and absent
+  from implementations without reference counting, so performance depends on details far from this loop.
 - It states the mechanism rather than the intent, where `join` says "one string from many parts" directly.
 
 ## Better

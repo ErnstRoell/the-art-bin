@@ -29,10 +29,8 @@ def report(rows):
 
 - Every container in the language is already falsy when empty, so `if rows:` states the condition directly
   while `len(rows) > 0` states an arithmetic consequence of it.
-- The comparison invites variants that are not equivalent — `>= 1`, `!= 0`, `> 0` — and reviewers have to check
-  each one instead of recognising a single idiom.
-- `len()` demands a sized object, so the check rejects generators and iterators that `if` would have handled,
-  narrowing the function for no benefit.
+- The comparison invites variants — `>= 1`, `!= 0`, `> 0` — that agree only because a length is never
+  negative, and reviewers have to check each one instead of recognising a single idiom.
 - The negative form is the tell: `if len(rows) == 0` is three tokens away from `if not rows`, and the second one
   is the sentence the author would say out loud.
 

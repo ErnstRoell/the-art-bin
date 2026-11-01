@@ -2,7 +2,7 @@
 
 import pytest
 
-from art_bin_server.corpus import Corpus, _bullets, _matches_version
+from art_bin_server.corpus import Corpus, _bullets, _matches_version, parse_sources
 
 
 @pytest.fixture(scope="module")
@@ -50,6 +50,27 @@ def test_every_smell_parses_and_has_a_better(corpus: Corpus) -> None:
         assert record["better"], record["id"]
         assert record["why_bad"], record["id"]
         assert record["distinguish"], record["id"]
+
+
+def test_every_smell_carries_its_sources(corpus: Corpus) -> None:
+    """docs/<language>-sources.md covers every entry (docs/adr/014)."""
+    ids = [smell["id"] for smell in corpus.catalog()["smells"]]
+    for record in corpus.get_smells(ids)["smells"]:
+        assert record["sources"], record["id"]
+        for row in record["sources"]:
+            assert row["claim"] and row["passage"], record["id"]
+            assert row["url"] is None or row["url"].startswith("https://"), row["url"]
+
+
+def test_sources_rows_parse_links_escaped_pipes_and_plain_sources() -> None:
+    rows = parse_sources(
+        "| Smell | Claim | Source | Passage |\n|---|---|---|---|\n"
+        '| [a-b](../snippets/x/code/a-b.md) | c | [T: s](https://e.x/p#:~:text=q) | "x \\|\\| y" |\n'
+        "| [a-b](../snippets/x/code/a-b.md) | fix | house taste | no external source |\n"
+    )
+    first, second = rows["a-b"]
+    assert first == {"claim": "c", "source": "T: s", "url": "https://e.x/p#:~:text=q", "passage": '"x || y"'}
+    assert second["source"] == "house taste" and second["url"] is None
 
 
 def test_alias_resolves_and_reports_origin(corpus: Corpus) -> None:
