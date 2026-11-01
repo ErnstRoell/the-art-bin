@@ -22,8 +22,8 @@ from.
 
 ## File Location And Identity
 
-Files live at `snippets/<language>/<group>/<slug>.md`. Today that is `snippets/python/code/` and
-`snippets/python/architecture/`.
+Files live at `snippets/<language>/<group>/<slug>.md`, e.g. `snippets/python/code/` and
+`snippets/rust/code/`.
 
 **The group is a size ceiling, not a taxonomy.** `code` allows 15 snippet lines and holds almost everything;
 `architecture` allows 40, for smells whose mechanism is the relationship between several pieces of code and
@@ -89,11 +89,13 @@ def add_item(item, basket=None):
 | `signature` | yes | yes | One sentence naming the mechanism. The primary shortlisting field. |
 | `severity` | yes | yes | `bug`, `trap`, or `taste`. What the smell actually costs. |
 | `category` | yes | yes | Consequence axis. One value from the closed list. |
-| `topic` | yes | yes | Python-feature axis. One value from the closed list. |
+| `topic` | yes | yes | Language-feature axis. One value from the closed list. |
 | `tags` | yes | yes | Open-ended conceptual labels. May be empty. |
 | `keywords` | yes | yes | Lexical hooks — tokens likely to appear in offending code. |
-| `language` | yes | no | `python`. Redundant with the path, but makes a file self-describing. |
-| `python` | yes | no | Version range in which this is a smell, e.g. `">=3.0"`, `">=3.9"`, `"<3.12"`. |
+| `language` | yes | yes | `python`, `rust` or `typescript`. Redundant with the path, but self-describing and filters the catalog. |
+| `python` | for python | no | Version range in which this is a Python smell, e.g. `">=3.0"`, `">=3.9"`. |
+| `rust` | for rust | no | Toolchain version range in which this is a Rust smell, e.g. `">=1.0"`, `">=1.45"`. |
+| `typescript` | for typescript | no | Compiler version range in which this is a TypeScript smell, e.g. `">=3.0"`, `">=4.9"`. |
 | `distinguish` | yes | no | One sentence describing the near miss that is *not* this smell. |
 | `added` | yes | no | ISO date the smell entered the corpus. |
 | `aliases` | no | no | Previously used slugs, so old identifiers still resolve. |
@@ -159,7 +161,7 @@ file — not something a contributor does in passing ([ADR 003](./adr/003-two-ax
 
 `correctness`, `security`, `performance`, `readability`, `maintainability`, `testability`
 
-**`topic`** — the Python feature it lives in:
+**`topic`** — the language feature it lives in:
 
 `exceptions`, `mutability`, `typing`, `naming`, `functions`, `classes`, `control-flow`, `imports`, `strings`,
 `io`, `concurrency`, `numerics`, `stdlib-misuse`
@@ -191,7 +193,10 @@ Smells needing more than 40 lines remain out of scope.
 
 ### Parseability
 
-Both code blocks must satisfy `ast.parse`. They need not run, and need not be importable — plenty of smells
+Both code blocks must parse: Python through `ast.parse`, Rust through `rustc` (edition 2021) as items or as a
+function body, ignoring every error about crates, macros or files the snippet leaves out. Validating Rust
+entries therefore needs a Rust toolchain on `PATH`. TypeScript goes through the `tsc` parser alone, as `.ts`
+and failing that as `.tsx`, so imports and types need not resolve; that needs `tsc` and `node` on `PATH`. They need not run, and need not be importable — plenty of smells
 concern API shape or naming and have no meaningful runtime. Requiring *runnable* code would push contributors to
 pad snippets with scaffolding, which fights the size ceiling. Requiring *parseable* code costs a one-line check
 and keeps the corpus mechanically processable.

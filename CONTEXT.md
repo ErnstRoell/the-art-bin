@@ -1,6 +1,6 @@
 # The Art Bin
 
-A curated corpus of bad Python code, one specimen per file, structured so a machine
+A curated corpus of bad Python, Rust and TypeScript code, one specimen per file, structured so a machine
 can find the ones a real codebase resembles.
 
 ## Language
@@ -21,7 +21,7 @@ per smell, from a closed list.
 _Avoid_: Kind, type, class
 
 **Topic**:
-What a smell is made of — the Python feature it lives in, e.g. exceptions or
+What a smell is made of — the language feature it lives in, e.g. exceptions or
 mutability. One value per smell, from a closed list.
 _Avoid_: Area, subject, domain
 

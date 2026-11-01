@@ -17,14 +17,15 @@ from pydantic import Field
 from .corpus import Corpus, CorpusError
 
 INSTRUCTIONS = """\
-The Art Bin is a curated corpus of Python code smells — from outright bugs to matters of \
+The Art Bin is a curated corpus of code smells across Python, Rust and TypeScript — from outright bugs to matters of \
 house taste. Use it to ground a code review in specific, named, opinionated entries \
 instead of generic advice.
 
 Work in two phases:
 
 1. Call `list_smells` once and read the catalog against the code in front of you. Shortlist \
-the few smells that might plausibly apply. Do not guess smell ids.
+the few smells that might plausibly apply. Do not guess smell ids. Use the `language` filter \
+('python', 'rust', 'typescript') to restrict the catalog to the relevant language.
 2. Call `get_smells` for that shortlist. Read each `distinguish` field before reporting \
 anything — it describes the legitimate variant that merely resembles the smell, and it is \
 the guard against flagging correct code.
@@ -48,12 +49,12 @@ def build_server(corpus: Corpus | None = None) -> MCPServer:
     @server.tool(
         annotations=READ_ONLY,
         description=(
-            "Return the catalog of known Python smells: one compact entry each, with a "
-            "signature naming the mechanism, plus severity, category, topic, tags and "
-            "keywords. Call this first, with no arguments, and read it against the code "
-            "you are reviewing to shortlist candidates. Full snippets are deliberately "
-            "not included here — fetch those with get_smells for the few that look "
-            "plausible."
+            "Return the catalog of known smells: one compact entry each, with a "
+            "signature naming the mechanism, plus severity, category, topic, tags, "
+            "keywords and language. Call this first, with no arguments or filtered by "
+            "language ('python', 'rust' or 'typescript'), and read it against the code you are "
+            "reviewing to shortlist candidates. Full snippets are deliberately not "
+            "included here — fetch those with get_smells for the few that look plausible."
         ),
     )
     def list_smells(
@@ -67,12 +68,23 @@ def build_server(corpus: Corpus | None = None) -> MCPServer:
         ] = None,
         topic: Annotated[
             list[str] | None,
-            Field(description="Restrict by Python feature, e.g. exceptions, mutability, naming."),
+            Field(description="Restrict by language feature, e.g. exceptions, mutability, naming, io, concurrency."),
         ] = None,
-        language: Annotated[str, Field(description="Corpus language.")] = "python",
+        language: Annotated[
+            str | None,
+            Field(description="Corpus language, e.g. 'python', 'rust' or 'typescript'. TypeScript entries cover plain JavaScript too."),
+        ] = None,
         python_version: Annotated[
             str | None,
             Field(description="Only smells that apply to this Python version, e.g. '3.12'."),
+        ] = None,
+        rust_version: Annotated[
+            str | None,
+            Field(description="Only smells that apply to this Rust toolchain version, e.g. '1.80'."),
+        ] = None,
+        typescript_version: Annotated[
+            str | None,
+            Field(description="Only smells that apply to this TypeScript compiler version, e.g. '5.4'."),
         ] = None,
     ) -> dict[str, Any]:
         return corpus.list_smells(
@@ -81,6 +93,8 @@ def build_server(corpus: Corpus | None = None) -> MCPServer:
             topic=topic,
             language=language,
             python_version=python_version,
+            rust_version=rust_version,
+            typescript_version=typescript_version,
         )
 
     @server.tool(

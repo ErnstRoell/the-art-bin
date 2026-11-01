@@ -17,7 +17,8 @@ obvious collisions but not a duplicate filed under different words.
 ## Adding a smell
 
 1. Run `make new-smell`. It asks for the slug and the filing, then writes
-   `snippets/python/<group>/<slug>.md` from `TEMPLATE.md`. Answer `architecture` for the group only if the
+   `snippets/<language>/<group>/<slug>.md` from `TEMPLATE.md` (`ARGS="--language rust"` for Rust, `--language typescript` for TypeScript, which
+   converts the template's version field and code fences for you). Answer `architecture` for the group only if the
    smell is one of the few that cannot be shown in 15 lines (see **Groups**).
 2. Name the slug after the smell, not the fix: `mutable-default-argument`, not `use-none-default`. The
    scaffolder refuses a slug that is already an id or an alias, and lists existing smells sharing a word with
@@ -36,8 +37,8 @@ flags that skip the prompts, which is what you want when adding several at once.
 
 ## Groups
 
-The corpus is split one level deeper than the language: `snippets/python/code/` and
-`snippets/python/architecture/`. The directory is not a second taxonomy — it selects the snippet size ceiling,
+The corpus is split one level deeper than the language: `snippets/<language>/code/` and
+`snippets/<language>/architecture/`. The directory is not a second taxonomy — it selects the snippet size ceiling,
 and nothing else. There is no `group` field; the path carries it.
 
 **`code/` — 15 lines.** Almost everything. The smell is visible in one function, and the ceiling is what keeps
@@ -88,7 +89,8 @@ the same two things, and everything hard-blocks. `make help` lists the rest of t
 
 - The `## Smell` block is 15 lines or fewer in `code/`, 40 or fewer in `architecture/`
 - The file sits in a known group directory: `code/` or `architecture/`
-- Both code blocks parse under `ast.parse` — they need not run, and `...` is fine
+- Both code blocks parse — `ast.parse` for Python, `rustc` for Rust, the `tsc` parser for TypeScript. They need
+  not run, and `...` is fine
 - `category` and `topic` are values listed in `TAXONOMY.md`
 - `signature` and `distinguish` are each a single sentence ending in a period
 - The filename matches `[a-z0-9-]+`, and no alias collides with any other slug or alias

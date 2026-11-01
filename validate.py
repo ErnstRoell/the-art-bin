@@ -18,7 +18,10 @@ import ast
 import datetime as dt
 import json
 import re
+import shutil
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 import yaml
@@ -34,9 +37,10 @@ SNIPPET_LINES = {"code": 15, "architecture": 40}
 SEVERITIES = ("bug", "trap", "taste")
 SLUG_RE = re.compile(r"^[a-z0-9-]+$")
 
+# Each language's version range lives in a field named after it: `python: ">=3.9"`, `rust: ">=1.70"`.
+LANGUAGES = ("python", "rust", "typescript")
 REQUIRED = (
     "language",
-    "python",
     "severity",
     "category",
     "topic",
@@ -47,7 +51,7 @@ REQUIRED = (
     "added",
 )
 OPTIONAL = ("aliases", "source")
-CATALOG_FIELDS = ("signature", "severity", "category", "topic", "tags", "keywords")
+CATALOG_FIELDS = ("signature", "severity", "category", "topic", "tags", "keywords", "language")
 SECTIONS = ("Smell", "Why it's bad", "Better")
 
 FRONTMATTER_RE = re.compile(r"\A---\n(.*?)\n---\n(.*)\Z", re.DOTALL)
@@ -97,6 +101,76 @@ def section_order(body: str) -> list[str]:
     return [line[3:].strip() for line in body.splitlines() if line.startswith("## ")]
 
 
+RUSTC = shutil.which("rustc")
+# Snippets lean on tokio, serde, log and friends and, like Python ones, only have to parse.
+# Everything rustc says after parsing — unresolved crates, macros, attributes, files named by
+# #[path] or include!, type errors — is about what the snippet leaves out, not whether it is Rust.
+# rustc 1.98: "couldn't read `path`: ..."; rustc 1.99: "couldn't find file `path`".
+NOT_A_PARSE_ERROR = re.compile(
+    r"^error(\[E\d+\]: |: cannot find |: couldn't read |: couldn't find file |: aborting )"
+)
+
+
+def rust_parse_error(code: str) -> str | None:
+    """None when the code parses as items, or as statements inside a function body."""
+    if RUSTC is None:
+        return "rustc not found; install Rust (https://rustup.rs) to validate Rust snippets"
+    found = []
+    for source in (code, f"fn _snippet() {{\n{code}\n}}"):
+        with tempfile.TemporaryDirectory() as out_dir:
+            result = subprocess.run(
+                [RUSTC, "--edition=2021", "--crate-type=lib", "--emit=metadata", "--out-dir", out_dir, "-"],
+                input=source,
+                capture_output=True,
+                text=True,
+            )
+        errors = [
+            line
+            for line in result.stderr.splitlines()
+            if line.startswith("error") and not NOT_A_PARSE_ERROR.match(line)
+        ]
+        if not errors:
+            return None
+        found.append(errors[0])
+    # Statements fail at crate level with "expected item", so report the body's error instead.
+    return found[1] if "expected item" in found[0] else found[0]
+
+
+TSC = shutil.which("tsc")
+# Only the parser's own diagnostics count, the counterpart of ast.parse: unresolved imports and
+# type errors are about what the snippet leaves out. A block that fails as .ts is retried as .tsx,
+# so React snippets pass without a fence tag of their own.
+TS_PARSE = """
+const ts = require(process.argv[1]);
+const code = require("fs").readFileSync(0, "utf8");
+let first;
+for (const kind of [ts.ScriptKind.TS, ts.ScriptKind.TSX]) {
+  const file = ts.createSourceFile("snippet", code, ts.ScriptTarget.Latest, false, kind);
+  const [diag] = file.parseDiagnostics;
+  if (!diag) process.exit(0);
+  if (!first) {
+    const { line } = file.getLineAndCharacterOfPosition(diag.start);
+    first = `${ts.flattenDiagnosticMessageText(diag.messageText, " ")} (line ${line + 1})`;
+  }
+}
+console.log(first);
+process.exit(1);
+"""
+
+
+def typescript_parse_error(code: str) -> str | None:
+    """None when the code parses as TypeScript, or as TSX."""
+    node = shutil.which("node")
+    if TSC is None or node is None:
+        return "tsc not found; install TypeScript (npm install -g typescript) to validate TypeScript snippets"
+    # tsc is <package>/bin/tsc, usually behind a symlink; the compiler API is <package>/lib/typescript.js.
+    compiler = Path(TSC).resolve().parent.parent / "lib" / "typescript.js"
+    result = subprocess.run([node, "-e", TS_PARSE, str(compiler)], input=code, capture_output=True, text=True)
+    if result.returncode == 0:
+        return None
+    return result.stdout.strip() or result.stderr.strip().splitlines()[-1]
+
+
 def is_one_sentence(text: str) -> bool:
     """One trailing period and no internal sentence break. Abbreviations will trip this."""
     stripped = text.strip()
@@ -125,13 +199,17 @@ def check_file(path: Path, taxonomy: dict[str, set[str]], errors: Errors) -> dic
     if not SLUG_RE.match(slug):
         errors.add(where, None, "filename must match [a-z0-9-]+")
 
-    for field in REQUIRED:
+    language = meta.get("language")
+    if language is not None and language not in LANGUAGES:
+        errors.add(where, "language", f"expected one of {', '.join(LANGUAGES)}, got {language!r}")
+    required = REQUIRED + ((language,) if language in LANGUAGES else ())
+    for field in required:
         if field not in meta:
             errors.add(where, field, "required field is missing")
         elif meta[field] is None or (isinstance(meta[field], str) and not meta[field].strip()):
             errors.add(where, field, "required field is empty")
     for field in meta:
-        if field not in REQUIRED + OPTIONAL:
+        if field not in required + OPTIONAL:
             errors.add(where, field, "unknown field")
 
     if (severity := meta.get("severity")) and severity not in SEVERITIES:
@@ -147,7 +225,7 @@ def check_file(path: Path, taxonomy: dict[str, set[str]], errors: Errors) -> dic
     language_dir = path.parent.parent.name
     if group not in SNIPPET_LINES:
         errors.add(where, None, f"group directory {group!r} is not one of {', '.join(SNIPPET_LINES)}")
-    if (language := meta.get("language")) and language != language_dir:
+    if language and language != language_dir:
         errors.add(where, "language", f"{language!r} does not match directory {language_dir!r}")
 
     for field in ("tags", "keywords", "aliases"):
@@ -183,16 +261,21 @@ def check_file(path: Path, taxonomy: dict[str, set[str]], errors: Errors) -> dic
             errors.add(where, name, f"expected exactly one fenced code block, found {len(blocks)}")
             continue
         language_tag, code = blocks[0]
-        if language_tag != "python":
-            errors.add(where, name, f"code fence must be tagged python, got {language_tag!r}")
+        if language_tag != language:
+            errors.add(where, name, f"code fence must be tagged {language}, got {language_tag!r}")
         lines = code.rstrip("\n").splitlines()
         limit = SNIPPET_LINES.get(group)
         if name == "Smell" and limit is not None and len(lines) > limit:
             errors.add(where, name, f"snippet is {len(lines)} lines, limit for {group}/ is {limit}")
-        try:
-            ast.parse(code)
-        except SyntaxError as exc:
-            errors.add(where, name, f"does not parse: {exc.msg} (line {exc.lineno})")
+        if language == "python":
+            try:
+                ast.parse(code)
+            except SyntaxError as exc:
+                errors.add(where, name, f"does not parse: {exc.msg} (line {exc.lineno})")
+        elif language == "rust" and (message := rust_parse_error(code)):
+            errors.add(where, name, f"does not parse: {message}")
+        elif language == "typescript" and (message := typescript_parse_error(code)):
+            errors.add(where, name, f"does not parse: {message}")
 
     if not sections.get("Why it's bad", "").strip():
         errors.add(where, "Why it's bad", "section is empty")
@@ -203,7 +286,16 @@ def check_file(path: Path, taxonomy: dict[str, set[str]], errors: Errors) -> dic
 
 
 def check_identifiers(records: list[dict], errors: Errors) -> None:
-    slugs = {record["entry"]["id"] for record in records}
+    seen_slugs: dict[str, str] = {}
+    for record in records:
+        slug = record["entry"]["id"]
+        where = str(record["path"].relative_to(ROOT))
+        if slug in seen_slugs:
+            errors.add(where, None, f"slug {slug!r} collides with {seen_slugs[slug]!r}")
+        else:
+            seen_slugs[slug] = where
+
+    slugs = set(seen_slugs.keys())
     seen: dict[str, str] = {}
     for record in records:
         where = str(record["path"].relative_to(ROOT))

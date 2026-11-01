@@ -1,8 +1,32 @@
 {
   "schema_version": 1,
-  "language": "python",
-  "count": 83,
+  "language": [
+    "python",
+    "rust",
+    "typescript"
+  ],
+  "count": 239,
   "smells": [
+    {
+      "id": "abbreviated-binding-name",
+      "signature": "Bindings are clipped to abbreviations such as res, cfg, val or mgr, so the reader has to decode what each one holds.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "naming",
+      "tags": [
+        "identifiers",
+        "abbreviations"
+      ],
+      "keywords": [
+        "let res =",
+        "let resp =",
+        "let cfg =",
+        "let val =",
+        "let tmp =",
+        "let mgr ="
+      ],
+      "language": "rust"
+    },
     {
       "id": "abbreviated-identifier",
       "signature": "Identifiers are clipped to abbreviations such as cfg, res, or val, so the reader has to decode them.",
@@ -22,7 +46,8 @@
         "idx",
         "num_",
         "ret ="
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "action-invoked-with-no-record-of-it",
@@ -43,7 +68,8 @@
         "doc.text =",
         "nothing to undo",
         "self.status("
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "algorithm-chosen-by-flag-inside-the-class",
@@ -64,7 +90,8 @@
         "elif self.mode",
         "def __init__(self, mode",
         "mode="
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "algorithm-skeleton-duplicated-per-variant",
@@ -85,7 +112,8 @@
         "log.info(",
         "for record in",
         "return len("
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "any-annotation-as-placeholder",
@@ -103,7 +131,29 @@
         "-> Any",
         "from typing import Any",
         "Dict[str, Any]"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "any-used-as-an-escape-hatch",
+      "signature": "A value is typed any to make an error go away, so every property access, call, and assignment through it is unchecked and the any flows on into whatever it touches.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "typing",
+      "tags": [
+        "any",
+        "unknown",
+        "type-safety",
+        "unsoundness"
+      ],
+      "keywords": [
+        ": any",
+        "as any",
+        "<any>",
+        "any[]",
+        "Record<string, any>"
+      ],
+      "language": "typescript"
     },
     {
       "id": "argument-mutated-in-place",
@@ -122,7 +172,8 @@
         ".append(",
         "return rows",
         "enumerate"
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "array-concatenated-in-a-loop",
@@ -142,7 +193,71 @@
         "np.append",
         "torch.empty(0",
         "out = torch.cat"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "array-fill-with-a-shared-object",
+      "signature": "An array is filled with an object or array value, so every slot references the same single object and a mutation through one index shows up at all of them.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "arrays",
+        "aliasing",
+        "initialisation",
+        "javascript"
+      ],
+      "keywords": [
+        ".fill([])",
+        ".fill({})",
+        ".fill(new Array(",
+        ".fill(new Map()",
+        "new Array(n).fill("
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "array-index-as-a-react-key",
+      "signature": "A React list uses each item's array index as its key, so inserting, removing or reordering items hands one item's component state and DOM to another.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "react",
+        "keys",
+        "lists",
+        "state",
+        "javascript"
+      ],
+      "keywords": [
+        "key={index}",
+        "key={i}",
+        "key={idx}",
+        "(item, index) =>",
+        "key={Math.random()}"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "array-sort-without-a-comparator",
+      "signature": "An array of numbers or other non-strings is sorted without a compare function, so elements are converted to strings and ordered by UTF-16 code units.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "stdlib-misuse",
+      "tags": [
+        "sorting",
+        "arrays",
+        "comparators",
+        "javascript"
+      ],
+      "keywords": [
+        ".sort()",
+        ".toSorted()",
+        "].sort()",
+        ".sort().reverse()"
+      ],
+      "language": "typescript"
     },
     {
       "id": "array-view-mutated-as-if-copy",
@@ -163,7 +278,29 @@
         ".copy()",
         "signal[",
         "np.ndarray"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "as-cast-that-silently-truncates",
+      "signature": "A numeric value that can be out of range is converted with as, so it wraps, truncates or saturates without any error.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "numerics",
+      "tags": [
+        "casts",
+        "overflow",
+        "integers"
+      ],
+      "keywords": [
+        " as u8",
+        " as u16",
+        " as u32",
+        " as i32",
+        " as usize",
+        "as u64 as"
+      ],
+      "language": "rust"
     },
     {
       "id": "assert-for-runtime-validation",
@@ -180,7 +317,51 @@
         "assert not",
         "-O",
         "AssertionError"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "async-callback-passed-to-foreach",
+      "signature": "An async function is passed to Array.prototype.forEach, which ignores the promise each call returns, so the code after the loop runs before any iteration finishes and their rejections are unhandled.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "concurrency",
+      "tags": [
+        "async",
+        "promise",
+        "array",
+        "javascript"
+      ],
+      "keywords": [
+        ".forEach(async",
+        "forEach(async (",
+        "await",
+        "no-misused-promises"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "async-work-started-in-a-constructor",
+      "signature": "A constructor starts an async method and drops the promise, so the object is used before it is ready and a failed load becomes an unhandled rejection.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "classes",
+      "tags": [
+        "async",
+        "promises",
+        "constructors",
+        "floating-promise",
+        "javascript"
+      ],
+      "keywords": [
+        "constructor(",
+        "this.load();",
+        "this.init();",
+        "this.connect();",
+        "void this.",
+        ".then("
+      ],
+      "language": "typescript"
     },
     {
       "id": "bare-except-pass",
@@ -197,7 +378,31 @@
         "except Exception",
         "pass",
         "try"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "barrel-file-re-exporting-everything",
+      "signature": "An index file re-exports every module in a directory and the application imports through it, so importing one name loads, parses and transforms the whole directory and invites circular imports.",
+      "severity": "trap",
+      "category": "performance",
+      "topic": "imports",
+      "tags": [
+        "barrel-files",
+        "modules",
+        "bundling",
+        "build-time",
+        "circular-imports",
+        "javascript"
+      ],
+      "keywords": [
+        "export * from",
+        "index.ts",
+        "export { default as",
+        "from \"../components\"",
+        "from \"./utils\""
+      ],
+      "language": "typescript"
     },
     {
       "id": "base-class-names-its-concrete-product",
@@ -218,7 +423,8 @@
         "Writer(",
         "super().",
         "= CsvWriter("
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "blocking-call-in-async-function",
@@ -237,7 +443,73 @@
         "time.sleep",
         "await",
         "run_in_executor"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "blocking-io-in-async-task",
+      "signature": "An async function calls blocking file, network or sleep APIs from the standard library, so the executor thread stalls and every task scheduled on it waits.",
+      "severity": "trap",
+      "category": "performance",
+      "topic": "concurrency",
+      "tags": [
+        "async",
+        "tokio",
+        "blocking",
+        "executor"
+      ],
+      "keywords": [
+        "async fn",
+        "std::fs::",
+        "std::thread::sleep",
+        "reqwest::blocking",
+        ".lock().unwrap()",
+        "std::net::TcpStream"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "bool-argument-at-the-call-site",
+      "signature": "A bool parameter picks between two behaviours, so the call site reads as a bare true or false that means nothing without the signature.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "functions",
+      "tags": [
+        "api-design",
+        "enums",
+        "call-sites"
+      ],
+      "keywords": [
+        ", true)",
+        ", false)",
+        "(true,",
+        "(false,",
+        ": bool) ->",
+        ": bool) {"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "boolean-flag-argument-at-the-call-site",
+      "signature": "A boolean positional parameter switches the function between modes, so the call site reads as a bare true or false that means nothing without the signature.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "functions",
+      "tags": [
+        "api-design",
+        "call-sites",
+        "javascript",
+        "options-object"
+      ],
+      "keywords": [
+        ", true)",
+        ", false)",
+        "(true,",
+        "(false,",
+        ": boolean,",
+        ": boolean)"
+      ],
+      "language": "typescript"
     },
     {
       "id": "boolean-parameter-selects-behaviour",
@@ -255,7 +527,28 @@
         "if flag:",
         "as_csv",
         "def export"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "boxed-dyn-error-in-a-library-api",
+      "signature": "A library's public functions return a boxed dynamic error, so callers can only match on its failure modes by downcasting to types the library never promised.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "exceptions",
+      "tags": [
+        "error-handling",
+        "api-design",
+        "library"
+      ],
+      "keywords": [
+        "Box<dyn Error>",
+        "Box<dyn std::error::Error>",
+        "anyhow::Result",
+        "Result<(), Box<dyn",
+        "downcast_ref::<"
+      ],
+      "language": "rust"
     },
     {
       "id": "broad-except-before-specific",
@@ -273,7 +566,8 @@
         "except ValueError:",
         "try:",
         "except OSError"
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "broad-exception-asserted-in-test",
@@ -291,7 +585,8 @@
         "assertRaises(Exception)",
         "with pytest.raises",
         "match="
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "builtin-name-shadowed",
@@ -311,7 +606,52 @@
         "type =",
         "input =",
         "str ="
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "cache-lookup-retyped-at-every-call-site",
+      "signature": "The check-cache, fetch, store sequence around an expensive call is retyped at every call site, so key layout, expiry and invalidation are decided independently in each one.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "classes",
+      "tags": [
+        "proxy",
+        "caching",
+        "traits",
+        "wrappers"
+      ],
+      "keywords": [
+        "cache.get(&key)",
+        "cache.insert(key",
+        "if let Some(cached) =",
+        "format!(\"user:{}\"",
+        "Instant::now() - ",
+        "fetch_user("
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "cache-map-consulted-at-every-fetch-site",
+      "signature": "The check-cache, fetch, store sequence around an expensive call is retyped at every call site, so key layout, expiry and invalidation are decided independently in each one.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "classes",
+      "tags": [
+        "proxy",
+        "caching",
+        "invalidation",
+        "interfaces"
+      ],
+      "keywords": [
+        "cache.get(",
+        "cache.set(",
+        "cache.delete(",
+        "new Map<string",
+        "Date.now() -",
+        "await api.fetchUser("
+      ],
+      "language": "typescript"
     },
     {
       "id": "caching-repeated-around-every-call",
@@ -332,7 +672,140 @@
         "json.dumps",
         "if hit is not None",
         "f\"user:{"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "catch-variable-assumed-to-be-an-error",
+      "signature": "A catch block reads properties such as message or code off the caught value without narrowing it, although JavaScript lets any value be thrown.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "exceptions",
+      "tags": [
+        "error-handling",
+        "unknown",
+        "narrowing",
+        "strict"
+      ],
+      "keywords": [
+        "catch (err)",
+        "catch (e: any)",
+        "err.message",
+        "e.message",
+        "as Error",
+        "useUnknownInCatchVariables"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class-newed-inside-shared-logic",
+      "signature": "A function that implements shared logic constructs with new the concrete class it works with, so a variant needing a different class copies the whole function to change the one line that names it.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "factory-method",
+        "dependency-injection",
+        "duplication",
+        "testability"
+      ],
+      "keywords": [
+        "new LocalStore(",
+        "new S3Store(",
+        "async function sync",
+        "syncToS3(",
+        "const store = new",
+        "implements Store"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class-per-pairing-of-two-axes",
+      "signature": "One family of classes varies along two independent axes at once, so the number of classes is the product of the two lists rather than their sum.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "bridge",
+        "composition",
+        "inheritance",
+        "combinatorial-explosion"
+      ],
+      "keywords": [
+        "class PdfS3Exporter",
+        "class CsvS3Exporter",
+        "class PdfEmailExporter",
+        "implements Exporter",
+        "S3Exporter",
+        "EmailExporter"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "class-with-only-static-members",
+      "signature": "A class holds only static methods and constants and is never instantiated, so it is a namespace wrapped around what the module already provides.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "classes",
+      "tags": [
+        "classes",
+        "static",
+        "namespacing",
+        "modules",
+        "javascript"
+      ],
+      "keywords": [
+        "static ",
+        "class Utils",
+        "class Helpers",
+        "class StringUtils",
+        "private constructor() {}",
+        "Utils."
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "clone-to-silence-the-borrow-checker",
+      "signature": "A value is cloned where a borrow would do, usually to make a borrow-checker error go away, so the code pays for an allocation it never needed.",
+      "severity": "taste",
+      "category": "performance",
+      "topic": "mutability",
+      "tags": [
+        "ownership",
+        "borrowing",
+        "allocation"
+      ],
+      "keywords": [
+        ".clone()",
+        ".to_owned()",
+        ".to_vec()",
+        "let owned =",
+        ".clone().iter()",
+        ".clone().len()"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "components-constructed-with-references-to-their-peers",
+      "signature": "Peer components take references to each other in their constructors and call each other directly, so the workflow connecting them exists only as a web of point-to-point calls.",
+      "severity": "taste",
+      "category": "testability",
+      "topic": "classes",
+      "tags": [
+        "mediator",
+        "coupling",
+        "ui",
+        "workflow"
+      ],
+      "keywords": [
+        "constructor(private results:",
+        "private spinner: Spinner",
+        "this.spinner.show()",
+        "this.spinner.hide()",
+        "searchBox!: SearchBox",
+        "this.detail.focus()"
+      ],
+      "language": "typescript"
     },
     {
       "id": "components-wired-to-each-other-directly",
@@ -353,7 +826,50 @@
         ".on_submit(",
         "self._history",
         "widget"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "concrete-type-hardcoded-in-shared-logic",
+      "signature": "A function that implements shared logic constructs the concrete type it works with, so a variant that needs a different type copies the whole function to change the one line that names it.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "factory-method",
+        "generics",
+        "dependency-injection"
+      ],
+      "keywords": [
+        "::new()",
+        "fn run_sync(",
+        "fn run_sync_s3(",
+        "LocalStore::new(",
+        "S3Store::new(",
+        "let store ="
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "console-log-used-as-logging",
+      "signature": "Service code reports what it is doing through console.log with concatenated strings, so there are no levels to filter by and no fields to query.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "io",
+      "tags": [
+        "logging",
+        "observability",
+        "node",
+        "javascript"
+      ],
+      "keywords": [
+        "console.log(",
+        "console.error(",
+        "console.warn(",
+        "console.info(",
+        "console.debug("
+      ],
+      "language": "typescript"
     },
     {
       "id": "constructor-does-io",
@@ -373,7 +889,51 @@
         "torch.load",
         "requests.get",
         ".glob("
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "constructor-performs-io",
+      "signature": "A new constructor reads files, the environment or the network, so the value cannot be created without its surroundings and failures surface as panics.",
+      "severity": "trap",
+      "category": "testability",
+      "topic": "classes",
+      "tags": [
+        "constructors",
+        "io",
+        "dependency-injection"
+      ],
+      "keywords": [
+        "fn new(",
+        "-> Self {",
+        "TcpStream::connect(",
+        "File::open(",
+        "fs::read_to_string(",
+        "env::var("
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "copy-built-by-listing-optional-fields",
+      "signature": "A copy of an object is built by listing its properties at the call site, and because the newer properties are optional the compiler accepts a copy that silently drops them.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "typing",
+      "tags": [
+        "prototype",
+        "copying",
+        "optional-properties",
+        "spread"
+      ],
+      "keywords": [
+        "baseUrl: base.baseUrl,",
+        "timeout: base.timeout,",
+        "headers: base.headers",
+        "?: ",
+        "...base",
+        "function withTimeout("
+      ],
+      "language": "typescript"
     },
     {
       "id": "copy-written-field-by-field",
@@ -394,7 +954,110 @@
         "= base.",
         "replace(",
         "vars(self)"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "date-now-for-elapsed-time",
+      "signature": "An elapsed duration is measured by subtracting two Date.now readings, which come from the adjustable wall clock rather than a monotonic one.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "stdlib-misuse",
+      "tags": [
+        "time",
+        "clocks",
+        "metrics",
+        "monotonic",
+        "javascript"
+      ],
+      "keywords": [
+        "Date.now() - start",
+        "const start = Date.now()",
+        "new Date().getTime()",
+        "Date.now() -"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "date-only-string-parsed-as-utc",
+      "signature": "A calendar date string such as 2024-03-10 is passed to new Date, which reads date-only forms as UTC midnight and so shows the previous day in any time zone west of UTC.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "stdlib-misuse",
+      "tags": [
+        "dates",
+        "time-zones",
+        "parsing",
+        "javascript"
+      ],
+      "keywords": [
+        "new Date(\"",
+        "new Date(isoDate)",
+        "Date.parse(",
+        "toLocaleDateString(",
+        ".getDate()"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "debug-assert-for-input-validation",
+      "signature": "A debug_assert checks caller input or external data, so the check vanishes from release builds and bad values flow on unchecked.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "control-flow",
+      "tags": [
+        "validation",
+        "release-build",
+        "assertions"
+      ],
+      "keywords": [
+        "debug_assert!(",
+        "debug_assert_eq!(",
+        "debug_assert_ne!(",
+        "--release"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "default-export-of-a-module",
+      "signature": "A module exposes its main value as a default export, so every importer picks its own name for it and a rename or a wrong import is invisible to the compiler.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "imports",
+      "tags": [
+        "modules",
+        "exports",
+        "refactoring",
+        "javascript"
+      ],
+      "keywords": [
+        "export default",
+        "export default function",
+        "export default class",
+        "export default {"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "delete-on-an-array-element",
+      "signature": "An element is removed from an array with the delete operator, which leaves an empty slot and does not change the length.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "arrays",
+        "delete",
+        "sparse-arrays",
+        "javascript"
+      ],
+      "keywords": [
+        "delete arr[",
+        "delete items[",
+        "delete tags[",
+        "delete list[",
+        "delete this.items["
+      ],
+      "language": "typescript"
     },
     {
       "id": "dict-get-with-mutable-fallback",
@@ -413,7 +1076,48 @@
         ").append(",
         "setdefault",
         "defaultdict"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "double-assertion-through-unknown",
+      "signature": "A value is cast through unknown or any to a type the compiler refused as a direct assertion, so the one warning that the types do not overlap is deliberately bypassed.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "typing",
+      "tags": [
+        "type-assertions",
+        "unsoundness",
+        "casts"
+      ],
+      "keywords": [
+        "as unknown as",
+        "as any as",
+        "unknown as"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "downcast-chain-instead-of-trait-method",
+      "signature": "Code switches on a trait object's concrete type with a chain of downcasts, so adding a type means finding and editing every chain.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "typing",
+      "tags": [
+        "dispatch",
+        "traits",
+        "any",
+        "polymorphism"
+      ],
+      "keywords": [
+        "downcast_ref::<",
+        "as_any()",
+        "&dyn Any",
+        "type_id()",
+        "TypeId::of::<",
+        "is::<"
+      ],
+      "language": "rust"
     },
     {
       "id": "eager-f-string-in-log-call",
@@ -432,7 +1136,135 @@
         "logger.error(f",
         "%s",
         "{loss:.4f}"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "edit-applied-with-no-record-of-it",
+      "signature": "A request is carried out immediately by the handler that received it, so the program holds no value representing the action and cannot undo, queue, log or replay it.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "command",
+        "undo",
+        "history",
+        "enums"
+      ],
+      "keywords": [
+        "fn on_key(",
+        "self.text.insert_str(",
+        "self.text.replace_range(",
+        "fn undo(",
+        "match key {",
+        "history: Vec<"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "effect-used-to-derive-state",
+      "signature": "A useEffect copies a value computed from props or state into another piece of state, so every change renders once with the stale value and again with the new one.",
+      "severity": "taste",
+      "category": "performance",
+      "topic": "functions",
+      "tags": [
+        "react",
+        "hooks",
+        "useEffect",
+        "derived-state",
+        "javascript"
+      ],
+      "keywords": [
+        "useEffect(",
+        "useState(",
+        "}, [items]);",
+        "setTotal(",
+        "setFiltered(",
+        "setFullName("
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "element-removed-by-index-while-looping",
+      "signature": "Elements are removed from a Vec by index inside a loop that advances the index regardless, so the element that slides into the removed slot is skipped.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "control-flow",
+      "tags": [
+        "vec",
+        "collections",
+        "iteration",
+        "borrow-checker"
+      ],
+      "keywords": [
+        ".remove(i)",
+        "while i < ",
+        "for i in 0..",
+        "i += 1",
+        ".swap_remove(i)"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "empty-catch-block-swallows-errors",
+      "signature": "A catch block or catch handler is empty, so every failure of the guarded code, expected or not, disappears without a trace.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "exceptions",
+      "tags": [
+        "error-handling",
+        "silent-failure",
+        "javascript"
+      ],
+      "keywords": [
+        "catch {}",
+        "catch (e) {}",
+        "catch (err) {}",
+        ".catch(() => {})",
+        "no-empty"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "empty-object-cast-then-filled-in",
+      "signature": "An object is created as an empty literal asserted to its finished type and completed by assigning properties one at a time, so the compiler treats every half-built value as a complete one.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "typing",
+      "tags": [
+        "builder",
+        "type-assertions",
+        "invariants",
+        "initialisation"
+      ],
+      "keywords": [
+        "{} as",
+        "= {} as Report",
+        "as unknown as",
+        "report.title =",
+        "!.",
+        "Partial<"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "enum-where-a-union-of-literals-fits",
+      "signature": "An enum models a small closed set that a union of string literals or an as-const object would express, so the code carries non-erasable runtime syntax that plain type stripping cannot run.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "typing",
+      "tags": [
+        "enums",
+        "literal-types",
+        "erasable-syntax",
+        "type-stripping"
+      ],
+      "keywords": [
+        "enum ",
+        "const enum",
+        "export enum"
+      ],
+      "language": "typescript"
     },
     {
       "id": "equality-chain-instead-of-lookup-table",
@@ -452,7 +1284,135 @@
         "elif clf_name ==",
         "data = None",
         "else:"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "error-logged-without-its-source-chain",
+      "signature": "An error is logged through its Display text alone, so its source chain never reaches the log.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "exceptions",
+      "tags": [
+        "error-handling",
+        "logging",
+        "observability"
+      ],
+      "keywords": [
+        "error!(\"{}\", e)",
+        "error!(\"failed: {e}\")",
+        "e.to_string()",
+        "format!(\"{}\", err)",
+        "Err(e) =>"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "error-mapped-without-its-source",
+      "signature": "An error is translated with map_err into a new error that drops the original, so the cause is gone before anyone can report it.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "exceptions",
+      "tags": [
+        "error-handling",
+        "chaining",
+        "thiserror"
+      ],
+      "keywords": [
+        "map_err(|_|",
+        ".map_err(|_| ",
+        "ok_or(",
+        "Error::Io",
+        "fn source("
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "error-rethrown-without-its-cause",
+      "signature": "A catch block throws a new Error with more context but does not pass the caught error as its cause, so the original message and stack are discarded.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "exceptions",
+      "tags": [
+        "error-handling",
+        "error-cause",
+        "es2022",
+        "javascript"
+      ],
+      "keywords": [
+        "catch (err)",
+        "throw new Error(",
+        "{ cause",
+        "preserve-caught-error"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "eval-or-function-constructor-on-input",
+      "signature": "A string built from input is run as code through eval, the Function constructor or a string passed to setTimeout or setInterval, so the input executes with the caller's privileges.",
+      "severity": "bug",
+      "category": "security",
+      "topic": "stdlib-misuse",
+      "tags": [
+        "injection",
+        "eval",
+        "code-execution",
+        "csp",
+        "javascript"
+      ],
+      "keywords": [
+        "eval(",
+        "new Function(",
+        "Function(\"",
+        "setTimeout(`",
+        "setTimeout(\"",
+        "setInterval(\""
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "event-source-calls-each-consumer-directly",
+      "signature": "The value that changed calls each interested subsystem by name, so it depends on every consumer of its own event.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "observer",
+        "events",
+        "channels",
+        "coupling"
+      ],
+      "keywords": [
+        "email::send_receipt(",
+        "inventory::reserve(",
+        "metrics::increment(",
+        "warehouse::notify(",
+        "fn pay(&mut self",
+        "broadcast::Sender"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "every-thread-seeds-the-same-rng",
+      "signature": "Each worker thread builds its generator from the same constant seed, so every worker draws the identical random stream.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "concurrency",
+      "tags": [
+        "randomness",
+        "rand",
+        "reproducibility",
+        "simulation"
+      ],
+      "keywords": [
+        "seed_from_u64(",
+        "StdRng::",
+        "SmallRng::",
+        "thread::spawn",
+        "par_iter()",
+        "SEED"
+      ],
+      "language": "rust"
     },
     {
       "id": "exception-logged-as-string",
@@ -471,7 +1431,205 @@
         "logger.error",
         "except",
         "{e}"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "expect-rejects-without-await",
+      "signature": "An expect with rejects or resolves is neither awaited nor returned, so the test finishes before the assertion runs and passes whatever the promise does.",
+      "severity": "bug",
+      "category": "testability",
+      "topic": "exceptions",
+      "tags": [
+        "jest",
+        "vitest",
+        "testing",
+        "async",
+        "javascript"
+      ],
+      "keywords": [
+        "expect(",
+        ".rejects.",
+        ".resolves.",
+        ".rejects.toThrow",
+        "valid-expect"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "expensive-client-built-per-call",
+      "signature": "A client, pool or other expensive shared resource is constructed afresh inside each function that needs it, so every call pays the setup cost and the instances share nothing.",
+      "severity": "trap",
+      "category": "performance",
+      "topic": "classes",
+      "tags": [
+        "singleton",
+        "connection-pool",
+        "shared-resources",
+        "arc"
+      ],
+      "keywords": [
+        "reqwest::Client::new()",
+        "PgPool::connect(",
+        "Client::builder()",
+        "Pool::new(",
+        "Regex::new(",
+        "fn handler("
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "export-method-added-to-every-shape-class",
+      "signature": "Each new operation over a stable set of types is added as a method on every one of those classes, so one concern is spread across all of them and each class collects unrelated reasons to change.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "visitor",
+        "double-dispatch",
+        "discriminated-unions",
+        "expression-problem"
+      ],
+      "keywords": [
+        "toSvg(): string",
+        "toDxf(): string",
+        "price(rates",
+        "validate(rules",
+        "\"validate\" in",
+        "type Shape = Circle | Square"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "family-members-matched-separately-on-one-setting",
+      "signature": "Each member of a family of related parts is chosen by its own match on the same setting, so nothing enforces that the parts assembled together come from one family.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "classes",
+      "tags": [
+        "abstract-factory",
+        "traits",
+        "consistency",
+        "backends"
+      ],
+      "keywords": [
+        "match backend {",
+        "Backend::Postgres =>",
+        "Backend::Sqlite =>",
+        "config.backend",
+        "PgQueue::new(",
+        "SqliteQueue::new("
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "family-parts-picked-by-separate-switches",
+      "signature": "Each member of a family of related parts is chosen by its own switch or ternary on the same setting, so nothing enforces that the parts assembled together come from one family.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "classes",
+      "tags": [
+        "abstract-factory",
+        "switch",
+        "consistency",
+        "backends"
+      ],
+      "keywords": [
+        "switch (config.cloud)",
+        "case \"aws\":",
+        "case \"gcp\":",
+        "new S3Store(",
+        "new GcsStore(",
+        "process.env.CLOUD"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "fetch-response-used-without-checking-ok",
+      "signature": "The result of fetch is parsed and used without checking ok or status, because fetch resolves normally for 4xx and 5xx responses and only rejects on network failure.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "io",
+      "tags": [
+        "fetch",
+        "http",
+        "error-handling",
+        "javascript"
+      ],
+      "keywords": [
+        "await fetch(",
+        "fetch(url)",
+        ".json()",
+        "res.json()",
+        "response.ok",
+        "res.ok"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "fetch-without-a-timeout",
+      "signature": "A fetch to a remote service is made without an AbortSignal, and fetch has no timeout option of its own, so a stalled server holds the caller for as long as the platform allows.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "io",
+      "tags": [
+        "fetch",
+        "http",
+        "timeout",
+        "abort-signal",
+        "javascript"
+      ],
+      "keywords": [
+        "await fetch(",
+        "fetch(url",
+        "signal:",
+        "AbortSignal.timeout",
+        "AbortController"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "float-compared-with-double-equals",
+      "signature": "Two floating point values that come out of arithmetic are compared with double equals, so representation error decides the answer.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "numerics",
+      "tags": [
+        "floating-point",
+        "equality",
+        "money"
+      ],
+      "keywords": [
+        "== 0.0",
+        "== 1.0",
+        "!= 0.0",
+        "f64::EPSILON",
+        "assert_eq!(",
+        "as f64 =="
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "float-compared-with-strict-equality",
+      "signature": "Two numbers that come out of floating point arithmetic are compared with strict equality, so binary representation error decides the answer.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "numerics",
+      "tags": [
+        "floating-point",
+        "equality",
+        "testing",
+        "javascript"
+      ],
+      "keywords": [
+        "=== 1",
+        "=== 0",
+        "!== 0",
+        "=== 0.3",
+        "toBe(0.",
+        "Number.EPSILON"
+      ],
+      "language": "typescript"
     },
     {
       "id": "float-equality-comparison",
@@ -491,7 +1649,71 @@
         "math.isclose",
         "np.allclose",
         "sum("
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "float-used-for-money",
+      "signature": "Currency amounts are held as fractional numbers in major units, so binary floating point error accumulates across sums and tax and toFixed rounds the binary value rather than the decimal one.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "numerics",
+      "tags": [
+        "money",
+        "floating-point",
+        "rounding",
+        "javascript"
+      ],
+      "keywords": [
+        "price: number",
+        "amount: number",
+        ".toFixed(2)",
+        "parseFloat(",
+        "* (1 + taxRate)",
+        "total: number"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "floating-promise-never-awaited",
+      "signature": "A call that returns a promise is used as a bare statement with no await, return or rejection handler, so the caller moves on before it settles and a rejection goes nowhere.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "concurrency",
+      "tags": [
+        "async",
+        "promise",
+        "unhandled-rejection",
+        "javascript"
+      ],
+      "keywords": [
+        "async function",
+        "save(",
+        "send(",
+        "no-floating-promises",
+        "UnhandledPromiseRejection"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "for-in-over-an-array",
+      "signature": "An array is iterated with for-in, which visits enumerable property names as strings, including inherited ones, rather than the array's elements.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "control-flow",
+      "tags": [
+        "loops",
+        "arrays",
+        "iteration",
+        "javascript"
+      ],
+      "keywords": [
+        "for (const i in ",
+        "for (let i in ",
+        "for (var i in ",
+        "for (const key in items"
+      ],
+      "language": "typescript"
     },
     {
       "id": "foreign-payload-reshaped-at-every-call-site",
@@ -512,7 +1734,50 @@
         "raw[",
         "payload[",
         "response.json()["
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "foreign-type-converted-inline-at-each-use",
+      "signature": "A foreign API's types are translated into local terms inline wherever they are used, so the translation exists once per call site instead of once per API.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "adapter",
+        "from",
+        "conversions",
+        "anti-corruption-layer"
+      ],
+      "keywords": [
+        "stripe::Customer",
+        "api_user.",
+        ".unwrap_or_default()",
+        "impl From<",
+        "as_deref().unwrap_or(",
+        "metadata.get(\""
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "format-allocated-per-iteration",
+      "signature": "A string is grown inside a loop by formatting each piece into a temporary String, so every iteration allocates and copies a value that is immediately thrown away.",
+      "severity": "taste",
+      "category": "performance",
+      "topic": "strings",
+      "tags": [
+        "allocation",
+        "formatting",
+        "strings"
+      ],
+      "keywords": [
+        "push_str(&format!(",
+        "+= &format!(",
+        "out = out +",
+        "s = format!(\"{}{}\", s,",
+        ".to_string() +"
+      ],
+      "language": "rust"
     },
     {
       "id": "function-call-as-default-argument",
@@ -531,7 +1796,8 @@
         "=dict()",
         "def ",
         "=time.time()"
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "generator-consumed-twice",
@@ -551,7 +1817,28 @@
         "sum(",
         "max(",
         "zip("
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "getter-and-setter-for-a-plain-field",
+      "signature": "A struct inside one crate exposes a getter and a setter that only read and write one private field, so the ceremony protects no invariant.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "classes",
+      "tags": [
+        "encapsulation",
+        "accessors",
+        "structs"
+      ],
+      "keywords": [
+        "pub fn get_",
+        "pub fn set_",
+        "fn set_name(&mut self",
+        "self.name = name;",
+        "&self.name"
+      ],
+      "language": "rust"
     },
     {
       "id": "getter-setter-wrapping-plain-attribute",
@@ -570,7 +1857,28 @@
         "self._name",
         "return self._",
         "def get_name"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "glob-import-of-a-module",
+      "signature": "Ordinary modules are imported with a glob, so nothing in the file says where a name comes from and a new public item upstream can make an existing name ambiguous.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "imports",
+      "tags": [
+        "modules",
+        "namespaces",
+        "glob-imports"
+      ],
+      "keywords": [
+        "use crate::",
+        "::*;",
+        "use super::*;",
+        "use models::*;",
+        "wildcard_imports"
+      ],
+      "language": "rust"
     },
     {
       "id": "global-statement-for-shared-state",
@@ -589,7 +1897,52 @@
         "is None:",
         "_MODEL",
         "= None"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "global-static-for-shared-state",
+      "signature": "A function keeps cache or configuration in a process-wide static, so its result depends on what ran before it in the same process.",
+      "severity": "trap",
+      "category": "testability",
+      "topic": "mutability",
+      "tags": [
+        "global-state",
+        "statics",
+        "caching",
+        "testing"
+      ],
+      "keywords": [
+        "static mut",
+        "static CACHE",
+        "LazyLock<Mutex<",
+        "OnceLock<",
+        "lazy_static!",
+        "thread_local!"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "guard-clauses-hardcoded-in-every-request-handler",
+      "signature": "Independent policy checks are hardcoded as a fixed sequence of early returns in each handler, so no entry point can add, remove or reorder them without copying the pile.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "control-flow",
+      "tags": [
+        "chain-of-responsibility",
+        "middleware",
+        "policy",
+        "composition"
+      ],
+      "keywords": [
+        "return deny(",
+        "if (!token)",
+        "if (rateLimited(",
+        "if (maintenanceMode())",
+        "headers.get(\"authorization\")",
+        "export async function handle"
+      ],
+      "language": "typescript"
     },
     {
       "id": "half-built-object-passed-around",
@@ -610,7 +1963,8 @@
         ".rows =",
         "obj = ",
         "setattr("
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "hardcoded-cuda-device",
@@ -629,7 +1983,8 @@
         "cuda:0",
         "torch.device",
         ".to(device)"
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "identical-value-copied-into-every-instance",
@@ -650,7 +2005,50 @@
         "copy(",
         "def __init__(self, x, y",
         "[Particle("
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "if-else-chain-instead-of-match",
+      "signature": "A chain of if and else-if branches tests one value for equality against constants, so a match or a table that states the mapping is written as control flow.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "control-flow",
+      "tags": [
+        "match",
+        "lookup-table",
+        "exhaustiveness"
+      ],
+      "keywords": [
+        "} else if code ==",
+        "} else if status ==",
+        "if kind ==",
+        "} else if",
+        "== \""
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "import-function-copied-per-file-format",
+      "signature": "Two variants of one procedure are written as two copies of the whole procedure, so the steps they share are duplicated and drift apart.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "functions",
+      "tags": [
+        "template-method",
+        "duplication",
+        "hooks",
+        "pipelines"
+      ],
+      "keywords": [
+        "async function importCsv(",
+        "async function importJson(",
+        "db.transaction(",
+        "tx.upsert(",
+        "log.info(`imported",
+        "return valid.length"
+      ],
+      "language": "typescript"
     },
     {
       "id": "internal-collection-returned-for-iteration",
@@ -671,7 +2069,28 @@
         ".extend(",
         "for x in obj.items()",
         "self._"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "internal-vec-handed-out-by-mutable-reference",
+      "signature": "A struct hands out its internal Vec so callers can loop over it, so every caller can reach the struct's invariants and every caller depends on the collection it happens to use.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "iterator",
+        "encapsulation",
+        "invariants"
+      ],
+      "keywords": [
+        "-> &mut Vec<",
+        "-> &Vec<",
+        "pub fn items(&mut self)",
+        "pub fn items(&self)",
+        "impl Iterator<Item ="
+      ],
+      "language": "rust"
     },
     {
       "id": "isinstance-chain-instead-of-dispatch",
@@ -689,7 +2108,72 @@
         "elif isinstance",
         "raise TypeError",
         "if isinstance(shape"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "isnan-global-coerces-its-argument",
+      "signature": "The global isNaN is used to validate input, but it coerces its argument to a number first, so empty and whitespace strings and booleans become 0 or 1 and pass as numbers.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "numerics",
+      "tags": [
+        "nan",
+        "coercion",
+        "validation",
+        "javascript"
+      ],
+      "keywords": [
+        "isNaN(",
+        "!isNaN(",
+        "window.isNaN(",
+        "isNaN(req.",
+        "isNaN(body."
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "json-parse-result-cast-to-a-type",
+      "signature": "The result of JSON.parse or response.json is asserted or annotated to a domain type with no runtime check, so the type describes what the author hoped arrived rather than what did.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "typing",
+      "tags": [
+        "type-assertions",
+        "validation",
+        "trust-boundary",
+        "runtime-types"
+      ],
+      "keywords": [
+        "JSON.parse(",
+        "as User",
+        "await res.json()",
+        "response.json()",
+        ".json() as",
+        "localStorage.getItem("
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "json-value-as-placeholder-type",
+      "signature": "Data whose shape is known is passed around as serde_json Value or a map of strings, so every field access is a runtime lookup the compiler cannot check.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "typing",
+      "tags": [
+        "serde",
+        "types",
+        "dynamic-data"
+      ],
+      "keywords": [
+        "serde_json::Value",
+        "-> Value",
+        "value[\"",
+        ".as_str().unwrap()",
+        "HashMap<String, Value>",
+        "Box<dyn Any>"
+      ],
+      "language": "rust"
     },
     {
       "id": "kwargs-forwarded-through-layers",
@@ -707,7 +2191,8 @@
         "**config",
         "def train(**",
         "(**kwargs)"
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "lambda-bound-to-a-name",
@@ -724,7 +2209,31 @@
         "= lambda",
         "= lambda x:",
         "normalise = lambda"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "large-integer-id-parsed-as-number",
+      "signature": "A 64-bit integer id arrives as a JSON number and is parsed into a JavaScript number, which rounds any value above Number.MAX_SAFE_INTEGER to a different id.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "numerics",
+      "tags": [
+        "json",
+        "precision",
+        "ids",
+        "bigint",
+        "javascript"
+      ],
+      "keywords": [
+        "id: number",
+        "userId: number",
+        "JSON.parse(",
+        "res.json()",
+        "Number(id)",
+        "parseInt(id"
+      ],
+      "language": "typescript"
     },
     {
       "id": "late-binding-closure-in-loop",
@@ -743,7 +2252,8 @@
         ".append(lambda",
         "def inner",
         "functools.partial"
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "leaf-and-branch-handled-by-the-caller",
@@ -764,7 +2274,50 @@
         "hasattr(",
         "isinstance(child, list)",
         "recursion"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "leaf-or-folder-check-in-every-tree-function",
+      "signature": "Every function over a tree repeats the check for leaf versus branch and the recursion into children, so the same case analysis is written once per traversal.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "control-flow",
+      "tags": [
+        "composite",
+        "recursion",
+        "trees",
+        "discriminated-unions"
+      ],
+      "keywords": [
+        "node.kind === \"file\"",
+        "node.kind === \"dir\"",
+        "node.children",
+        "for (const child of",
+        ".reduce(",
+        "type TreeNode ="
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "len-compared-to-zero",
+      "signature": "Emptiness is tested by comparing len against zero instead of calling is_empty.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "control-flow",
+      "tags": [
+        "collections",
+        "idiom",
+        "clippy"
+      ],
+      "keywords": [
+        ".len() == 0",
+        ".len() > 0",
+        ".len() != 0",
+        ".len() >= 1",
+        "len_zero"
+      ],
+      "language": "rust"
     },
     {
       "id": "length-checked-instead-of-truthiness",
@@ -783,7 +2336,50 @@
         "== 0",
         "if len(rows)",
         "!= 0"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "library-installs-a-global-logger",
+      "signature": "Library code installs the process-wide logger, tracing subscriber or panic hook, so the application that uses it loses control of that global and may panic when it sets its own.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "io",
+      "tags": [
+        "logging",
+        "global-state",
+        "libraries"
+      ],
+      "keywords": [
+        "env_logger::init()",
+        "tracing_subscriber::fmt::init()",
+        "set_global_default(",
+        "log::set_logger(",
+        "std::panic::set_hook("
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "lifecycle-spread-across-boolean-properties",
+      "signature": "Several boolean properties encode one lifecycle state, so the object can hold combinations no real state corresponds to and every method re-tests the flags.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "control-flow",
+      "tags": [
+        "state",
+        "discriminated-unions",
+        "flags",
+        "lifecycle"
+      ],
+      "keywords": [
+        "isDraft = true",
+        "isInReview = false",
+        "isPublished",
+        "isArchived",
+        "if (this.is",
+        "reviewer?: string"
+      ],
+      "language": "typescript"
     },
     {
       "id": "list-mutated-while-iterating",
@@ -802,7 +2398,114 @@
         "for row in rows",
         ".pop(",
         "for item in items"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "lock-guard-held-across-await",
+      "signature": "A mutex guard is still alive when the task reaches an await, so the lock is held while the task is suspended and every other task that wants it stalls or deadlocks.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "concurrency",
+      "tags": [
+        "async",
+        "mutex",
+        "deadlock",
+        "tokio"
+      ],
+      "keywords": [
+        ".lock().await",
+        ".lock().unwrap()",
+        "MutexGuard",
+        ".await",
+        "RwLock",
+        "current_thread"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "log-message-formatted-before-the-log-call",
+      "signature": "A log message is built with format before the log macro is called, so the work is done even when that level is switched off.",
+      "severity": "taste",
+      "category": "performance",
+      "topic": "strings",
+      "tags": [
+        "logging",
+        "formatting",
+        "laziness"
+      ],
+      "keywords": [
+        "let msg = format!(",
+        "debug!(\"{}\", msg)",
+        "format!(\"{:#?}\"",
+        "trace!(\"{}\",",
+        "log_enabled!("
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "logical-or-default-overrides-zero",
+      "signature": "A default is applied with logical or, so a legitimate falsy value such as 0, an empty string or false is replaced by the default as if it were missing.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "control-flow",
+      "tags": [
+        "defaults",
+        "falsy",
+        "nullish-coalescing",
+        "javascript"
+      ],
+      "keywords": [
+        "|| 0",
+        "|| 1",
+        "|| \"\"",
+        "||=",
+        "opts.",
+        "options."
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "loose-equality-with-double-equals",
+      "signature": "Two values are compared with double equals, so the abstract equality algorithm coerces strings, numbers, booleans and objects into each other before comparing.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "control-flow",
+      "tags": [
+        "equality",
+        "coercion",
+        "javascript"
+      ],
+      "keywords": [
+        " == ",
+        " != ",
+        "== 0",
+        "== \"\"",
+        "== false",
+        "== true"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "lossy-conversion-of-a-path-that-round-trips",
+      "signature": "A path, OS string or byte buffer is converted to a String lossily and then used to address the original, so any non-UTF-8 byte is replaced and the result names something else.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "strings",
+      "tags": [
+        "utf-8",
+        "osstr",
+        "paths",
+        "encoding"
+      ],
+      "keywords": [
+        ".to_string_lossy()",
+        "from_utf8_lossy(",
+        ".display().to_string()",
+        ".into_string().unwrap()",
+        "OsString"
+      ],
+      "language": "rust"
     },
     {
       "id": "lru-cache-on-instance-method",
@@ -821,7 +2524,119 @@
         "@cache",
         "def read(self",
         "cached_property"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "map-value-updated-through-a-clone",
+      "signature": "A map value is fetched as a clone or default, modified, and never written back, so the update is dropped instead of stored.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "stdlib-misuse",
+      "tags": [
+        "hashmap",
+        "entry-api",
+        "lost-update"
+      ],
+      "keywords": [
+        ".get(&",
+        ".cloned().unwrap_or_default()",
+        ".unwrap_or_default()",
+        "contains_key(",
+        ".entry(",
+        "or_default()"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "math-random-used-for-a-token",
+      "signature": "A token, session id, password reset code or nonce is generated with Math.random, which is not a cryptographically secure generator.",
+      "severity": "bug",
+      "category": "security",
+      "topic": "stdlib-misuse",
+      "tags": [
+        "randomness",
+        "tokens",
+        "crypto",
+        "session",
+        "javascript"
+      ],
+      "keywords": [
+        "Math.random()",
+        "Math.random().toString(36)",
+        ".toString(36).slice(2)",
+        "Math.floor(Math.random() *",
+        "token",
+        "nonce"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "method-detached-from-its-object",
+      "signature": "A method is passed as a callback or destructured off its object, so it is later called without its receiver and this is undefined or some other object.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "classes",
+      "tags": [
+        "this",
+        "binding",
+        "callbacks",
+        "events",
+        "javascript"
+      ],
+      "keywords": [
+        "addEventListener(\"click\", this.",
+        ".forEach(this.",
+        ".then(this.",
+        "setTimeout(this.",
+        "onClick={this.",
+        "const { "
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "mode-field-matched-in-every-method",
+      "signature": "One mode field is matched in every method of a struct, so a single algorithm is smeared across the impl instead of living in one type.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "strategy",
+        "traits",
+        "generics",
+        "enums"
+      ],
+      "keywords": [
+        "mode: Mode",
+        "match self.mode {",
+        "Mode::Fast =>",
+        "Mode::Accurate =>",
+        "self.mode ==",
+        "kind: Kind"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "mode-union-switched-on-in-every-method",
+      "signature": "One mode value is switched on in every method of a class, so a single algorithm is smeared across the class instead of living in one object.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "strategy",
+        "dispatch",
+        "modes",
+        "function-types"
+      ],
+      "keywords": [
+        "switch (this.mode)",
+        "this.mode === \"",
+        "mode: Mode",
+        "type Mode = \"",
+        "default: return",
+        "private readonly mode"
+      ],
+      "language": "typescript"
     },
     {
       "id": "model-evaluated-in-train-mode",
@@ -841,7 +2656,30 @@
         "torch.no_grad",
         "with torch.inference_mode",
         "def accuracy"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "model-method-calls-every-downstream-side-effect",
+      "signature": "The object that changed calls each interested subsystem by name, so it depends on every consumer of its own event.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "observer",
+        "events",
+        "coupling",
+        "notifications"
+      ],
+      "keywords": [
+        "await sendReceipt(",
+        "await reserveStock(",
+        "warehouse.notify(",
+        "metrics.increment(",
+        "this.status = \"paid\"",
+        "async pay("
+      ],
+      "language": "typescript"
     },
     {
       "id": "module-level-side-effect-on-import",
@@ -860,7 +2698,8 @@
         "np.random.seed",
         "DEVICE =",
         "warnings.filterwarnings"
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "mutable-class-attribute",
@@ -879,7 +2718,8 @@
         "class",
         "self.items.append",
         "cls."
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "mutable-default-argument",
@@ -897,7 +2737,29 @@
         "def",
         "default argument",
         "append"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "naive-datetime-for-an-instant",
+      "signature": "A moment in time is stored as a NaiveDateTime or local time with no offset, so the value cannot say which instant it refers to.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "typing",
+      "tags": [
+        "time",
+        "timezones",
+        "chrono",
+        "serialisation"
+      ],
+      "keywords": [
+        "NaiveDateTime",
+        "Local::now().naive_local()",
+        ".naive_utc()",
+        "Local::now()",
+        "PrimitiveDateTime"
+      ],
+      "language": "rust"
     },
     {
       "id": "naive-datetime-for-instants",
@@ -915,7 +2777,8 @@
         "utcnow()",
         "datetime.today()",
         "last_seen"
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "name-lies-about-the-type",
@@ -933,7 +2796,97 @@
         "_str",
         "_array",
         ".items()"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "needless-collect-before-iterating",
+      "signature": "An iterator is collected into a Vec only to be iterated, counted or searched once, so the code allocates a whole intermediate collection it never keeps.",
+      "severity": "taste",
+      "category": "performance",
+      "topic": "control-flow",
+      "tags": [
+        "iterators",
+        "allocation",
+        "laziness"
+      ],
+      "keywords": [
+        ".collect::<Vec<_>>()",
+        ".collect::<Vec<",
+        ").into_iter()",
+        ".collect();",
+        ".len() > 0"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "non-error-value-thrown",
+      "signature": "A string, number or plain object is thrown or used as a promise rejection reason instead of an Error, so no stack trace is captured and catch sites cannot rely on name or message.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "exceptions",
+      "tags": [
+        "error-handling",
+        "stack-trace",
+        "promise",
+        "javascript"
+      ],
+      "keywords": [
+        "throw \"",
+        "throw '",
+        "throw `",
+        "throw {",
+        "Promise.reject(\"",
+        "reject(\"",
+        "only-throw-error",
+        "no-throw-literal"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "non-null-assertion-on-a-lookup",
+      "signature": "A lookup that can miss, such as Map.get or Array.find, is followed by a non-null assertion, so the missing case is silenced rather than handled and surfaces later as a TypeError on undefined.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "typing",
+      "tags": [
+        "non-null-assertion",
+        "undefined",
+        "lookups",
+        "unsoundness"
+      ],
+      "keywords": [
+        ".get(",
+        ").get(key)!",
+        ".find(",
+        ")!.",
+        "]!",
+        "!."
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "object-spread-mistaken-for-a-deep-copy",
+      "signature": "An object is copied with spread and then a nested object or array in the copy is mutated, but spread copies only one level, so the original is mutated too.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "spread",
+        "shallow-copy",
+        "aliasing",
+        "javascript",
+        "immutability"
+      ],
+      "keywords": [
+        "{ ...",
+        "{...",
+        "[...",
+        "Object.assign(",
+        ".push(",
+        "structuredClone"
+      ],
+      "language": "typescript"
     },
     {
       "id": "open-without-encoding",
@@ -952,7 +2905,8 @@
         "\"r\")",
         ".read_text()",
         "encoding="
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "operation-added-to-every-class-in-a-hierarchy",
@@ -973,7 +2927,52 @@
         "def validate(self",
         "class Circle",
         "def accept("
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "operation-added-to-every-impl-of-a-trait",
+      "signature": "Each new operation over a closed set of types is added as a trait method implemented on every one of them, so one concern is spread across all the impls and each type collects unrelated reasons to change.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "visitor",
+        "expression-problem",
+        "enums",
+        "traits"
+      ],
+      "keywords": [
+        "fn to_svg(&self)",
+        "fn to_dxf(&self)",
+        "fn price(&self",
+        "impl Shape for",
+        "trait Shape {",
+        "fn validate(&self"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "optional-behaviour-stacked-as-bool-fields",
+      "signature": "A writer or service takes several bool options for independent optional behaviours, so its body interleaves all of them and the number of paths through it doubles with each flag.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "functions",
+      "tags": [
+        "decorator",
+        "composition",
+        "io",
+        "wrappers"
+      ],
+      "keywords": [
+        "compress: bool",
+        "encrypt: bool",
+        "buffered: bool",
+        "if self.compress {",
+        "if opts.",
+        "checksum: bool"
+      ],
+      "language": "rust"
     },
     {
       "id": "optional-behaviour-stacked-as-flags",
@@ -994,7 +2993,8 @@
         "if log:",
         "if cache",
         "=False,"
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "optional-dependency-import-swallowed",
@@ -1013,7 +3013,132 @@
         "import matplotlib",
         "pass",
         "NameError"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "optional-fields-instead-of-a-discriminated-union",
+      "signature": "One interface holds several optional fields that are only meaningful in particular combinations, so the type admits impossible states and the compiler cannot narrow any field from another.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "typing",
+      "tags": [
+        "discriminated-unions",
+        "invalid-states",
+        "optional-properties",
+        "type-design"
+      ],
+      "keywords": [
+        "loading?: boolean",
+        "data?:",
+        "error?:",
+        "?: ",
+        "isLoading"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "options-bag-of-behaviour-toggles",
+      "signature": "A function takes an options object of boolean toggles for independent optional behaviours, so its body interleaves all of them and the number of paths through it doubles with each flag.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "functions",
+      "tags": [
+        "decorator",
+        "composition",
+        "higher-order-functions",
+        "boolean-options"
+      ],
+      "keywords": [
+        "retry?: boolean",
+        "cache?: boolean",
+        "log?: boolean",
+        "if (opts.retry)",
+        "if (options.",
+        "{ retry: true, cache: true }"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "out-parameter-instead-of-return-value",
+      "signature": "A function writes its result into a mutable reference argument and returns a flag or nothing, so the value it produces does not appear in its signature.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "functions",
+      "tags": [
+        "out-parameters",
+        "api-design",
+        "return-values"
+      ],
+      "keywords": [
+        "out: &mut Vec<",
+        "result: &mut",
+        "-> bool {",
+        "&mut Vec<",
+        "errors: &mut Vec<"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "parseint-passed-to-map",
+      "signature": "parseInt is passed by reference to map, so the element index arrives as its radix argument and every element after the first is parsed in the wrong base.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "stdlib-misuse",
+      "tags": [
+        "callbacks",
+        "parsing",
+        "arity",
+        "javascript"
+      ],
+      "keywords": [
+        ".map(parseInt)",
+        "map(parseInt)",
+        ".map(Number.parseInt)",
+        ".forEach(parseInt)"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "path-assembled-via-format",
+      "signature": "A filesystem path is assembled with format or string concatenation, so separators are written by hand and the path is forced through UTF-8 text.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "io",
+      "tags": [
+        "paths",
+        "filesystem",
+        "portability",
+        "utf-8"
+      ],
+      "keywords": [
+        "format!(\"{}/{}\"",
+        ".display(), ",
+        "push_str(\"/",
+        "+ \"/\" +",
+        "-> String",
+        ".to_str().unwrap()"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "path-attribute-reaching-outside-the-crate",
+      "signature": "A path attribute or include macro compiles a source file from outside the crate into it, so the same code becomes separate, incompatible types in every crate that does this.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "imports",
+      "tags": [
+        "modules",
+        "workspaces",
+        "code-sharing"
+      ],
+      "keywords": [
+        "#[path = \"../",
+        "#[path =",
+        "include!(\"../",
+        "mod shared;"
+      ],
+      "language": "rust"
     },
     {
       "id": "path-built-by-string-concatenation",
@@ -1032,7 +3157,53 @@
         "os.path.join",
         "+ \".pt\"",
         "f\"{root}/{name}\""
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "peers-wired-together-with-rc-refcell",
+      "signature": "Peer components hold Rc RefCell handles to each other and call each other directly, so the workflow connecting them exists only as a web of point-to-point calls checked at runtime.",
+      "severity": "taste",
+      "category": "testability",
+      "topic": "classes",
+      "tags": [
+        "mediator",
+        "rc",
+        "refcell",
+        "coupling",
+        "events"
+      ],
+      "keywords": [
+        "Rc<RefCell<",
+        "Weak<RefCell<",
+        ".borrow_mut().",
+        "Option<Rc<RefCell<",
+        "already borrowed",
+        "upgrade().unwrap()"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "per-kind-data-duplicated-into-each-item",
+      "signature": "Every object in a large collection gets its own copy or freshly loaded instance of state that is identical across them, so memory and setup cost scale with the number of objects rather than the number of distinct values.",
+      "severity": "trap",
+      "category": "performance",
+      "topic": "classes",
+      "tags": [
+        "flyweight",
+        "memory",
+        "sharing",
+        "immutability"
+      ],
+      "keywords": [
+        "structuredClone(",
+        "{ ...kind",
+        "new Path2D(",
+        "loadSprite(",
+        "Array.from({ length",
+        "for (let i = 0; i < count"
+      ],
+      "language": "typescript"
     },
     {
       "id": "pickle-loaded-from-untrusted-file",
@@ -1052,7 +3223,52 @@
         "joblib.load",
         "allow_pickle=True",
         "weights_only"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "plain-object-used-as-a-dictionary",
+      "signature": "A plain object literal is used as a dictionary keyed by external strings, so keys such as __proto__ or constructor collide with the prototype and lookups or writes go to Object.prototype.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "stdlib-misuse",
+      "tags": [
+        "prototype",
+        "dictionaries",
+        "map",
+        "javascript",
+        "prototype-pollution"
+      ],
+      "keywords": [
+        "= {}",
+        "Record<string,",
+        "[key: string]:",
+        "[key] =",
+        "in counts",
+        "__proto__"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "policy-checks-nailed-into-one-function",
+      "signature": "Independent policy checks are hardcoded as a fixed sequence of early returns in one function, so no caller can add, remove or reorder them.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "control-flow",
+      "tags": [
+        "chain-of-responsibility",
+        "middleware",
+        "policies"
+      ],
+      "keywords": [
+        "return Err(Rejected::",
+        "fn check_request(",
+        "if !is_authenticated(",
+        "if rate_limited(",
+        "if req.body.len() >",
+        "Vec<Box<dyn Check>>"
+      ],
+      "language": "rust"
     },
     {
       "id": "print-used-as-logging",
@@ -1070,7 +3286,94 @@
         "print(\"step\"",
         "print(f",
         "flush=True"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "println-used-as-logging",
+      "signature": "A library or long-running service reports progress and errors with println or eprintln, so the output has no level, timestamp, target or way to turn it off.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "io",
+      "tags": [
+        "logging",
+        "stdout",
+        "observability"
+      ],
+      "keywords": [
+        "println!(\"",
+        "eprintln!(\"",
+        "dbg!(",
+        "println!(\"DEBUG",
+        "println!(\"Processing"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "private-array-returned-from-a-getter",
+      "signature": "A class returns the private array it stores so callers can loop over it, so any caller can mutate the object's internals through the value it was given.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "iterator",
+        "encapsulation",
+        "aliasing",
+        "generators"
+      ],
+      "keywords": [
+        "return this.tracks;",
+        "getTracks(): Track[]",
+        "private tracks: Track[]",
+        ".push(...",
+        ".splice(i, 1)",
+        "*[Symbol.iterator]()"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "procedure-duplicated-per-variant",
+      "signature": "Two variants of one procedure are written as two copies of the whole procedure, so the steps they share are duplicated and drift apart.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "functions",
+      "tags": [
+        "template-method",
+        "traits",
+        "default-methods",
+        "duplication"
+      ],
+      "keywords": [
+        "fn import_csv(",
+        "fn import_json(",
+        "log::info!(\"importing",
+        "for record in",
+        "tx.commit()",
+        "Ok(count)"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "process-exit-called-from-library-code",
+      "signature": "A function below the program's entry point calls process.exit on failure, so callers cannot recover and pending output such as the error message itself can be lost.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "functions",
+      "tags": [
+        "process",
+        "exit",
+        "error-handling",
+        "cli",
+        "node",
+        "javascript"
+      ],
+      "keywords": [
+        "process.exit(",
+        "process.exit(1)",
+        "process.exit(0)",
+        "exit(1)"
+      ],
+      "language": "typescript"
     },
     {
       "id": "processing-steps-nailed-into-one-function",
@@ -1091,7 +3394,8 @@
         "rate_limited(",
         "return None",
         "early return"
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "product-family-selected-part-by-part",
@@ -1112,7 +3416,50 @@
         "= S3",
         "= Gcs",
         "os.environ["
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "promise-constructor-wrapping-a-promise",
+      "signature": "A new Promise is constructed only to forward the result of an API that already returns a promise, so the wrapper adds resolve and reject plumbing that can silently drop errors.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "concurrency",
+      "tags": [
+        "promise",
+        "async",
+        "antipattern",
+        "javascript"
+      ],
+      "keywords": [
+        "new Promise(",
+        "(resolve, reject) =>",
+        ".then(resolve",
+        ".catch(reject",
+        "resolve(await"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "promise-returned-inside-try-without-await",
+      "signature": "An async function returns a promise from inside a try block without awaiting it, so a rejection settles the returned promise directly and the surrounding catch and finally never see it.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "exceptions",
+      "tags": [
+        "async",
+        "promise",
+        "try-catch",
+        "javascript"
+      ],
+      "keywords": [
+        "return fetch",
+        "return this.",
+        "try {",
+        "} catch",
+        "return-await"
+      ],
+      "language": "typescript"
     },
     {
       "id": "raise-without-from-in-except",
@@ -1131,7 +3478,8 @@
         "from exc",
         "as exc",
         "During handling"
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "range-len-for-index",
@@ -1149,7 +3497,284 @@
         "for i in range(len",
         "[i]",
         "[index]"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "range-over-len-for-indexing",
+      "signature": "A loop ranges over zero to len only to index the slice it is already walking, so every access is a bounds-checked lookup instead of an iterator.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "control-flow",
+      "tags": [
+        "iteration",
+        "indexing",
+        "bounds-checks"
+      ],
+      "keywords": [
+        "for i in 0..",
+        ".len() {",
+        "[i]",
+        "[i + 1]",
+        "needless_range_loop"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "rc-clone-mistaken-for-deep-copy",
+      "signature": "A struct holding Rc or Arc handles to mutable data is cloned as if that produced an independent copy, so writes through the copy reach the original.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "aliasing",
+        "rc",
+        "refcell",
+        "shared-ownership"
+      ],
+      "keywords": [
+        "Rc<RefCell<",
+        "Arc<Mutex<",
+        "#[derive(Clone)]",
+        ".clone()",
+        "borrow_mut()"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "recursive-merge-open-to-prototype-pollution",
+      "signature": "A recursive merge copies every key of a parsed object into a target, so a __proto__ or constructor key walks onto Object.prototype and adds properties to every object in the process.",
+      "severity": "bug",
+      "category": "security",
+      "topic": "mutability",
+      "tags": [
+        "prototype-pollution",
+        "deep-merge",
+        "json",
+        "javascript"
+      ],
+      "keywords": [
+        "for (const key in source)",
+        "deepMerge(",
+        "merge(",
+        "target[key] =",
+        "__proto__",
+        "JSON.parse(req.body)"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "reference-to-owned-container-parameter",
+      "signature": "A function takes a reference to String, Vec or PathBuf when it only reads, so callers holding a str, slice, array or Path must allocate an owned value just to call it.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "functions",
+      "tags": [
+        "borrowing",
+        "api-design",
+        "slices",
+        "clippy"
+      ],
+      "keywords": [
+        "&String",
+        "&Vec<",
+        "&PathBuf",
+        "&Box<",
+        ": &String)",
+        "ptr_arg"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "regex-open-to-catastrophic-backtracking",
+      "signature": "A regular expression nests a quantifier inside a repeated group, so a crafted non-matching input makes the backtracking engine try exponentially many splits and stalls the event loop.",
+      "severity": "trap",
+      "category": "security",
+      "topic": "strings",
+      "tags": [
+        "redos",
+        "regex",
+        "denial-of-service",
+        "event-loop",
+        "javascript"
+      ],
+      "keywords": [
+        ")+$/",
+        ")*$/",
+        "+)+",
+        "*)*",
+        "(.+)+",
+        "new RegExp(",
+        ".test(req."
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "result-discarded-with-let-underscore",
+      "signature": "A Result is bound to an underscore or turned into an Option and dropped, so the error it carried is discarded without a trace.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "exceptions",
+      "tags": [
+        "error-handling",
+        "silent-failure"
+      ],
+      "keywords": [
+        "let _ =",
+        ".ok();",
+        "unwrap_or_default()",
+        "if let Ok(",
+        "#[must_use]"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "rollback-by-copying-properties-back-by-hand",
+      "signature": "A caller saves an object's state for rollback by copying out the properties it happens to know about, so a property added later is never restored.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "memento",
+        "rollback",
+        "snapshot",
+        "immutability"
+      ],
+      "keywords": [
+        "const oldTotal =",
+        "const oldStatus =",
+        "order.total = oldTotal",
+        "catch (err)",
+        "throw err;",
+        "order.lines = "
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "rollback-by-saving-selected-fields",
+      "signature": "A caller saves a struct's state for rollback by copying out the fields it happens to know about, so a field added later is never restored.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "memento",
+        "undo",
+        "snapshots",
+        "clone"
+      ],
+      "keywords": [
+        "let saved_",
+        "let old_",
+        "self.balance = saved",
+        "rollback",
+        "restore(",
+        "#[derive(Clone)]"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "satisfies-operator-avoided-with-an-annotation",
+      "signature": "A constant object is given a wide type annotation to check its shape, so the inferred literal keys and value types are discarded and later code has to narrow or assert what the compiler already knew.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "typing",
+      "tags": [
+        "satisfies",
+        "widening",
+        "type-annotations",
+        "config"
+      ],
+      "keywords": [
+        ": Record<",
+        "const config:",
+        "const routes:",
+        "satisfies"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "sdk-clients-orchestrated-in-each-handler",
+      "signature": "A handler builds several collaborators of a subsystem it does not own and sequences their setup, ordering and teardown itself, so the same wiring is retyped in every handler.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "facade",
+        "coupling",
+        "setup",
+        "teardown",
+        "lifecycle"
+      ],
+      "keywords": [
+        "new Pool(",
+        "await pool.connect()",
+        "client.release()",
+        "new S3Client(",
+        "puppeteer.launch(",
+        "await browser.close()"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "sequential-await-for-independent-requests",
+      "signature": "Independent async requests are awaited one after another, in a loop or in consecutive statements, so total latency is the sum of every round trip instead of the slowest one.",
+      "severity": "taste",
+      "category": "performance",
+      "topic": "concurrency",
+      "tags": [
+        "async",
+        "promise",
+        "latency",
+        "javascript"
+      ],
+      "keywords": [
+        "for (const",
+        "await",
+        "no-await-in-loop",
+        "Promise.all"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "setinterval-with-an-async-callback",
+      "signature": "setInterval is given an async callback, which it fires on schedule without waiting for the previous run, so a slow run overlaps the next one and its rejections are unhandled.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "concurrency",
+      "tags": [
+        "async",
+        "timers",
+        "polling",
+        "javascript"
+      ],
+      "keywords": [
+        "setInterval(async",
+        "setInterval(",
+        "await",
+        "clearInterval"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "settimeout-in-place-of-synchronisation",
+      "signature": "Code waits a fixed number of milliseconds and then assumes an asynchronous operation has finished, instead of waiting on the operation or a condition it produces.",
+      "severity": "trap",
+      "category": "testability",
+      "topic": "concurrency",
+      "tags": [
+        "timers",
+        "flaky-tests",
+        "async",
+        "javascript"
+      ],
+      "keywords": [
+        "setTimeout(resolve",
+        "new Promise((r) => setTimeout",
+        "sleep(",
+        "waitForTimeout",
+        "await delay("
+      ],
+      "language": "typescript"
     },
     {
       "id": "shallow-copy-of-nested-data",
@@ -1168,7 +3793,8 @@
         "copy.copy",
         "[:]",
         ".update("
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "shape-relied-on-broadcasting",
@@ -1188,7 +3814,30 @@
         "reshape(-1",
         "(n, 1)",
         "predictions - targets"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "shared-client-newed-in-every-module",
+      "signature": "A class holding shared state or an expensive resource is constructed with new inside each function or module that needs it, so the instances disagree with each other and the setup cost is paid per call site.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "classes",
+      "tags": [
+        "singleton",
+        "shared-state",
+        "modules",
+        "composition-root"
+      ],
+      "keywords": [
+        "new FeatureFlags(",
+        "new PrismaClient()",
+        "new Pool(",
+        "new ApiClient(",
+        "await flags.load()",
+        "export async function"
+      ],
+      "language": "typescript"
     },
     {
       "id": "shared-resource-reconstructed-per-caller",
@@ -1209,7 +3858,75 @@
         "def __init__(self)",
         "requests.get",
         "load_config()"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "shared-value-cloned-into-every-element",
+      "signature": "Every element in a large collection owns its own clone of state that is identical across them, so memory and setup cost scale with the number of elements rather than the number of distinct values.",
+      "severity": "trap",
+      "category": "performance",
+      "topic": "classes",
+      "tags": [
+        "flyweight",
+        "arc",
+        "interning",
+        "memory"
+      ],
+      "keywords": [
+        "style: Style",
+        "font: Font",
+        "style.clone()",
+        "texture: Vec<u8>",
+        "Arc<",
+        "for _ in 0.."
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "shell-command-built-with-a-template-literal",
+      "signature": "A shell command is built by interpolating values into a string passed to exec or execSync, so any value containing shell syntax is executed by the shell.",
+      "severity": "bug",
+      "category": "security",
+      "topic": "io",
+      "tags": [
+        "injection",
+        "subprocess",
+        "shell",
+        "child-process",
+        "node",
+        "javascript"
+      ],
+      "keywords": [
+        "exec(`",
+        "execSync(`",
+        "shell: true",
+        "spawn(\"sh\", [\"-c\"",
+        "child_process",
+        "exec(\"git \" +"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "shell-command-built-with-format",
+      "signature": "A shell command is built by formatting values into a string and run through sh -c, so any value containing shell syntax is executed.",
+      "severity": "bug",
+      "category": "security",
+      "topic": "io",
+      "tags": [
+        "injection",
+        "subprocess",
+        "shell"
+      ],
+      "keywords": [
+        "Command::new(\"sh\")",
+        ".arg(\"-c\")",
+        "Command::new(\"bash\")",
+        "Command::new(\"cmd\")",
+        ".args([\"/C\"",
+        "format!("
+      ],
+      "language": "rust"
     },
     {
       "id": "shell-command-from-interpolated-string",
@@ -1228,7 +3945,47 @@
         "subprocess.run(f",
         "os.popen(",
         "check=True"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "should-panic-without-expected",
+      "signature": "A test marked should_panic names no expected message, or asserts only is_err, so any failure inside it passes including a mistake in the test itself.",
+      "severity": "trap",
+      "category": "testability",
+      "topic": "exceptions",
+      "tags": [
+        "testing",
+        "panic",
+        "assertions"
+      ],
+      "keywords": [
+        "#[should_panic]",
+        "#[test]",
+        "is_err()",
+        "assert!(result.is_err())"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "single-letter-binding-for-domain-value",
+      "signature": "A single letter names a domain value rather than an index or a generic parameter, so the code cannot be read without its definition.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "naming",
+      "tags": [
+        "identifiers",
+        "domain-language"
+      ],
+      "keywords": [
+        "let p =",
+        "let c =",
+        "let d =",
+        "let a =",
+        "|x|",
+        "(a, b)"
+      ],
+      "language": "rust"
     },
     {
       "id": "single-letter-name-for-domain-value",
@@ -1248,7 +4005,29 @@
         "d =",
         "p =",
         "t ="
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "sleep-in-place-of-synchronisation",
+      "signature": "A fixed sleep stands in for waiting on a condition, such as a server becoming ready or a worker finishing, so correctness depends on how fast the machine is.",
+      "severity": "trap",
+      "category": "testability",
+      "topic": "concurrency",
+      "tags": [
+        "testing",
+        "flaky",
+        "timing",
+        "synchronisation"
+      ],
+      "keywords": [
+        "thread::sleep(",
+        "tokio::time::sleep(",
+        "Duration::from_millis(",
+        "Duration::from_secs(",
+        "// wait for"
+      ],
+      "language": "rust"
     },
     {
       "id": "sleep-to-await-a-condition",
@@ -1266,7 +4045,51 @@
         "sleep(",
         "asyncio.sleep",
         "await asyncio.sleep"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "sort-mutates-the-caller-array",
+      "signature": "An array that belongs to the caller or to state is sorted or reversed in place, and because sort and reverse return the same array the mutation reads like a pure transformation.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "mutability",
+      "tags": [
+        "sorting",
+        "arrays",
+        "side-effects",
+        "aliasing",
+        "javascript"
+      ],
+      "keywords": [
+        ".sort(",
+        ".reverse()",
+        "return events.reverse()",
+        "const sorted = values.sort("
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "sql-assembled-with-format",
+      "signature": "A SQL statement is assembled by formatting values into the query text, so a value containing SQL is executed as SQL.",
+      "severity": "bug",
+      "category": "security",
+      "topic": "strings",
+      "tags": [
+        "injection",
+        "sql",
+        "sqlx",
+        "database"
+      ],
+      "keywords": [
+        "query(&format!(",
+        "format!(\"SELECT",
+        "format!(\"DELETE",
+        "WHERE name = '{}'",
+        "execute(&format!(",
+        "push_str(\" AND"
+      ],
+      "language": "rust"
     },
     {
       "id": "sql-built-by-string-concatenation",
@@ -1287,7 +4110,54 @@
         "f\"SELECT",
         "% (",
         ".format("
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "sql-built-with-a-template-literal",
+      "signature": "A SQL statement is assembled by interpolating values into a template literal or concatenated string, so a value containing SQL is executed as SQL.",
+      "severity": "bug",
+      "category": "security",
+      "topic": "strings",
+      "tags": [
+        "injection",
+        "sql",
+        "database",
+        "pg",
+        "javascript"
+      ],
+      "keywords": [
+        "query(`SELECT",
+        "`SELECT * FROM",
+        "WHERE email = '${",
+        "= ${",
+        "$queryRawUnsafe(",
+        "execute(`",
+        "+ \"' AND"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "state-machine-as-struct-flags",
+      "signature": "Several bool and Option fields together encode one lifecycle state, so the struct can hold combinations no real state corresponds to and every method re-checks them.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "control-flow",
+      "tags": [
+        "state",
+        "state-machine",
+        "enums",
+        "typestate"
+      ],
+      "keywords": [
+        "is_connected: bool",
+        "is_authenticated: bool",
+        "Option<TcpStream>",
+        "token: Option<String>",
+        "if self.is_",
+        ".as_mut().unwrap()"
+      ],
+      "language": "rust"
     },
     {
       "id": "state-machine-encoded-in-boolean-flags",
@@ -1308,7 +4178,8 @@
         "self.is_",
         "= True",
         "if self.is_"
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "string-concatenation-in-a-loop",
@@ -1325,7 +4196,50 @@
         "out = \"\"",
         "result = ''",
         "for row in"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "string-parameter-for-a-closed-set",
+      "signature": "A parameter or field typed string only ever holds one of a few known values, so a typo or an unsupported value compiles and the valid set lives only in comparisons scattered through the code.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "typing",
+      "tags": [
+        "literal-types",
+        "unions",
+        "magic-strings",
+        "stringly-typed"
+      ],
+      "keywords": [
+        "status: string",
+        "kind: string",
+        "mode: string",
+        "type: string",
+        "=== \""
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "string-replace-changes-only-the-first-match",
+      "signature": "String replace is called with a string pattern as though it replaced every occurrence, when a string pattern replaces only the first.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "strings",
+      "tags": [
+        "strings",
+        "replace",
+        "regex",
+        "javascript"
+      ],
+      "keywords": [
+        ".replace(\" \"",
+        ".replace(\"",
+        ".replace('",
+        ".replace(secret",
+        ".replace(\",\""
+      ],
+      "language": "typescript"
     },
     {
       "id": "stringly-typed-mode-parameter",
@@ -1344,7 +4258,29 @@
         "split=",
         "mode=",
         "raise ValueError"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "stringly-typed-parameter",
+      "signature": "A string parameter selects behaviour from a fixed set of magic values, so a typo is only caught at runtime if at all.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "typing",
+      "tags": [
+        "enums",
+        "api-design",
+        "magic-strings"
+      ],
+      "keywords": [
+        "format: &str",
+        "mode: &str",
+        "== \"json\"",
+        "\"csv\" =>",
+        "match mode {",
+        "kind: String"
+      ],
+      "language": "rust"
     },
     {
       "id": "strip-used-to-remove-a-suffix",
@@ -1363,7 +4299,52 @@
         ".rstrip(",
         ".strip(\".txt\")",
         "removesuffix"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "struct-copied-by-listing-its-fields",
+      "signature": "A copy of a struct is built by listing its fields with a Default fill for the rest, so a field added later silently takes its default instead of the original's value.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "classes",
+      "tags": [
+        "prototype",
+        "clone",
+        "struct-update",
+        "defaults"
+      ],
+      "keywords": [
+        "..Default::default()",
+        "name: base.name.clone(),",
+        "retries: base.retries,",
+        "Config {",
+        "fn copy_of(",
+        "fn with_"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "struct-with-option-fields-filled-in-later",
+      "signature": "A struct is created with every field None and completed by assigning them one at a time, so every half-built value has the same type as a finished one and each use unwraps.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "classes",
+      "tags": [
+        "builder",
+        "invariants",
+        "initialisation",
+        "options"
+      ],
+      "keywords": [
+        "Option<",
+        ": None,",
+        ".unwrap()",
+        "= Some(",
+        "#[derive(Default)]",
+        "report.title = Some("
+      ],
+      "language": "rust"
     },
     {
       "id": "subclass-per-combination-of-two-axes",
@@ -1384,7 +4365,8 @@
         "(Notifier)",
         "super().send",
         "class "
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "subject-calls-its-listeners-by-name",
@@ -1405,7 +4387,30 @@
         "notify_",
         "self.status =",
         "def pay(self)"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "subsystem-assembled-at-every-call-site",
+      "signature": "A caller builds several collaborators of a subsystem it does not own and sequences their setup, ordering and teardown itself, so the same wiring is retyped at every call site.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "facade",
+        "encapsulation",
+        "setup",
+        "teardown"
+      ],
+      "keywords": [
+        "Decoder::new(",
+        "Resampler::new(",
+        "Encoder::new(",
+        ".flush()?;",
+        ".finish()?;",
+        "let mut decoder ="
+      ],
+      "language": "rust"
     },
     {
       "id": "subsystem-wired-up-at-every-call-site",
@@ -1428,7 +4433,8 @@
         "= Mailer(",
         "boto3.client",
         "Session("
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "super-init-not-called",
@@ -1447,7 +4453,54 @@
         "nn.Module",
         "class ",
         "self.layer ="
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "switch-without-an-exhaustiveness-check",
+      "signature": "A switch over a union handles today's members with no never check or exhaustive return type, so a member added later falls through silently instead of failing to compile.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "control-flow",
+      "tags": [
+        "unions",
+        "exhaustiveness",
+        "never",
+        "switch"
+      ],
+      "keywords": [
+        "switch (",
+        "case \"",
+        "default:",
+        ".kind)",
+        ".type)"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "sync-fs-call-in-a-request-handler",
+      "signature": "A synchronous fs call such as readFileSync runs inside a request handler, so the whole Node.js event loop waits on the disk and every other request stalls.",
+      "severity": "trap",
+      "category": "performance",
+      "topic": "io",
+      "tags": [
+        "event-loop",
+        "blocking",
+        "filesystem",
+        "node",
+        "server",
+        "javascript"
+      ],
+      "keywords": [
+        "readFileSync(",
+        "writeFileSync(",
+        "existsSync(",
+        "statSync(",
+        "readdirSync(",
+        "execSync(",
+        "(req, res) =>"
+      ],
+      "language": "typescript"
     },
     {
       "id": "sys-path-mutated-to-find-modules",
@@ -1465,7 +4518,29 @@
         "sys.path.insert",
         "os.path.dirname(__file__)",
         "../src"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "system-time-used-for-elapsed-time",
+      "signature": "A duration is measured by subtracting two SystemTime readings, which the wall clock can move between, instead of using the monotonic Instant.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "stdlib-misuse",
+      "tags": [
+        "time",
+        "clocks",
+        "monotonic",
+        "durations"
+      ],
+      "keywords": [
+        "SystemTime::now()",
+        ".duration_since(start)",
+        ".elapsed().unwrap()",
+        "UNIX_EPOCH",
+        "Utc::now() -"
+      ],
+      "language": "rust"
     },
     {
       "id": "tensor-accumulated-with-graph-attached",
@@ -1485,7 +4560,50 @@
         ".detach()",
         ".item()",
         "loss.backward()"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "tree-walk-repeated-in-every-caller",
+      "signature": "Every function over a tree repeats the match on leaf versus branch and the recursion into children, so the same case analysis is written once per traversal.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "control-flow",
+      "tags": [
+        "composite",
+        "recursion",
+        "trees",
+        "enums"
+      ],
+      "keywords": [
+        "Node::File",
+        "Node::Dir",
+        "fn total_size(",
+        "fn count_files(",
+        "for child in children",
+        "match node {"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "trim-matches-used-to-remove-one-suffix",
+      "signature": "A trim_matches call is written as though it removed one prefix or suffix, when it repeatedly strips every match or, given a char array, any of those characters.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "strings",
+      "tags": [
+        "strings",
+        "suffixes",
+        "patterns"
+      ],
+      "keywords": [
+        ".trim_end_matches(\"",
+        ".trim_start_matches(\"",
+        ".trim_end_matches(&[",
+        ".trim_matches(",
+        "strip_suffix("
+      ],
+      "language": "rust"
     },
     {
       "id": "try-block-too-wide",
@@ -1504,7 +4622,26 @@
         "except KeyError",
         "return None",
         "json.loads"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "ts-ignore-instead-of-ts-expect-error",
+      "signature": "A type error is suppressed with ts-ignore, which stays silent even after the error is fixed, so the directive outlives its reason and later hides a new unrelated error on that line.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "typing",
+      "tags": [
+        "suppression",
+        "compiler-directives",
+        "lint"
+      ],
+      "keywords": [
+        "// @ts-ignore",
+        "@ts-ignore",
+        "@ts-nocheck"
+      ],
+      "language": "typescript"
     },
     {
       "id": "type-compared-with-equality",
@@ -1523,7 +4660,117 @@
         ") == list",
         ") is str",
         "type(value)"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "type-guard-that-checks-too-little",
+      "signature": "A user-defined type predicate returns true after checking one field, and the compiler narrows to the full type on its word, so every unchecked field is trusted without evidence.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "typing",
+      "tags": [
+        "type-predicates",
+        "narrowing",
+        "unsoundness",
+        "validation"
+      ],
+      "keywords": [
+        ": value is",
+        ": x is",
+        ": obj is",
+        "is User",
+        "\"id\" in",
+        "typeof"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "type-per-combination-of-two-axes",
+      "signature": "One family of types varies along two independent axes at once, so the number of types is the product of the two lists rather than their sum.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "bridge",
+        "generics",
+        "composition",
+        "combinatorial-explosion"
+      ],
+      "keywords": [
+        "struct PdfToS3",
+        "struct CsvToS3",
+        "struct PdfToEmail",
+        "impl Exporter for",
+        "ToS3",
+        "ToEmail"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "type-suffix-contradicts-the-value",
+      "signature": "An identifier carries a type or unit suffix that the value does not have, usually left over from before a refactor.",
+      "severity": "taste",
+      "category": "readability",
+      "topic": "naming",
+      "tags": [
+        "identifiers",
+        "types",
+        "refactoring-residue"
+      ],
+      "keywords": [
+        "_vec",
+        "_list",
+        "_map",
+        "_str",
+        "_arr",
+        "_ms"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "typeof-object-check-lets-null-through",
+      "signature": "A value is tested with typeof equal to object as though that ruled out null, but typeof null is also object, so null passes the check.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "typing",
+      "tags": [
+        "typeof",
+        null,
+        "type-guards",
+        "narrowing",
+        "javascript"
+      ],
+      "keywords": [
+        "typeof value === \"object\"",
+        "typeof x === 'object'",
+        "=== \"object\"",
+        "=== 'object'",
+        "value is Record<"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "ui-handler-applies-edit-with-no-record-of-it",
+      "signature": "A request is carried out immediately by the event handler that received it, so the program holds no value representing the action and cannot undo, queue, log or replay it.",
+      "severity": "taste",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "command",
+        "undo",
+        "history",
+        "closures"
+      ],
+      "keywords": [
+        "addEventListener(\"click\"",
+        "editor.text =",
+        "editor.text.slice(",
+        "\"nothing to undo\"",
+        "onKeyDown(",
+        "event.key ==="
+      ],
+      "language": "typescript"
     },
     {
       "id": "undo-implemented-by-restoring-fields",
@@ -1544,7 +4791,141 @@
         "except",
         "order.total =",
         "rollback"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "untrusted-bytes-cast-into-a-struct",
+      "signature": "Bytes read from a file or socket are reinterpreted as a struct with unsafe pointer casts or transmute, so input the program did not produce can hold values the type forbids.",
+      "severity": "bug",
+      "category": "security",
+      "topic": "io",
+      "tags": [
+        "unsafe",
+        "deserialisation",
+        "undefined-behaviour",
+        "parsing"
+      ],
+      "keywords": [
+        "ptr::read(",
+        "read_unaligned(",
+        "transmute",
+        "as *const Header",
+        "from_raw_parts(",
+        "unsafe {"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "untrusted-string-assigned-to-innerhtml",
+      "signature": "A string containing user data is assigned to innerHTML or passed to dangerouslySetInnerHTML, so markup in the data is parsed and its event handlers run.",
+      "severity": "bug",
+      "category": "security",
+      "topic": "strings",
+      "tags": [
+        "xss",
+        "dom",
+        "html",
+        "react",
+        "javascript"
+      ],
+      "keywords": [
+        ".innerHTML =",
+        ".innerHTML +=",
+        ".outerHTML =",
+        "insertAdjacentHTML(",
+        "dangerouslySetInnerHTML",
+        "__html:"
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "unwrap-in-fallible-flow",
+      "signature": "A Result or Option that depends on input, the environment or the network is unwrapped, so an ordinary failure becomes a panic.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "exceptions",
+      "tags": [
+        "error-handling",
+        "panic",
+        "result"
+      ],
+      "keywords": [
+        ".unwrap()",
+        ".expect(\"",
+        "parse::<",
+        "panicked at",
+        "called `Result::unwrap()` on an `Err` value"
+      ],
+      "language": "rust"
+    },
+    {
+      "id": "user-path-joined-without-containment",
+      "signature": "A file path is built by joining a request value onto a root directory with no check that the result stays inside it, so ../ segments read or write any file the process can reach.",
+      "severity": "bug",
+      "category": "security",
+      "topic": "io",
+      "tags": [
+        "path-traversal",
+        "filesystem",
+        "node",
+        "javascript"
+      ],
+      "keywords": [
+        "path.join(",
+        "path.resolve(",
+        "req.params.",
+        "req.query.",
+        "readFile(",
+        "createReadStream(",
+        "sendFile("
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "var-captured-by-a-loop-closure",
+      "signature": "A callback created inside a loop captures a var-declared variable, so every callback shares the one function-scoped binding and sees its final value.",
+      "severity": "bug",
+      "category": "correctness",
+      "topic": "control-flow",
+      "tags": [
+        "closures",
+        "scope",
+        "var",
+        "loops",
+        "javascript"
+      ],
+      "keywords": [
+        "for (var ",
+        "var i = 0",
+        "var item =",
+        "addEventListener(",
+        "setTimeout(",
+        ".onclick ="
+      ],
+      "language": "typescript"
+    },
+    {
+      "id": "vendor-response-shape-read-at-every-call-site",
+      "signature": "A foreign API's response shape is translated into local terms inline wherever it is used, so the translation exists once per call site instead of once per API.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "classes",
+      "tags": [
+        "adapter",
+        "boundary",
+        "third-party",
+        "translation"
+      ],
+      "keywords": [
+        "res.data.",
+        "amount_cents / 100",
+        "* 1000)",
+        "as any",
+        "Stripe.Charge",
+        ".json() as"
+      ],
+      "language": "typescript"
     },
     {
       "id": "wall-clock-used-for-elapsed-time",
@@ -1563,7 +4944,28 @@
         "elapsed",
         "time.monotonic",
         "perf_counter"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "wildcard-arm-on-an-owned-enum",
+      "signature": "A match over an enum the crate owns ends in a wildcard arm, so a variant added later is silently handled by the fallback instead of being flagged by the compiler.",
+      "severity": "trap",
+      "category": "maintainability",
+      "topic": "control-flow",
+      "tags": [
+        "match",
+        "exhaustiveness",
+        "enums"
+      ],
+      "keywords": [
+        "_ =>",
+        "_ => {}",
+        "_ => false",
+        "_ => None",
+        "_ => unreachable!()"
+      ],
+      "language": "rust"
     },
     {
       "id": "wildcard-import",
@@ -1579,7 +4981,8 @@
         "import *",
         "from os.path import *",
         "__all__"
-      ]
+      ],
+      "language": "python"
     },
     {
       "id": "worker-processes-share-one-rng-seed",
@@ -1599,7 +5002,27 @@
         "DataLoader",
         "__getitem__",
         "worker_init_fn"
-      ]
+      ],
+      "language": "python"
+    },
+    {
+      "id": "zip-over-unequal-lengths",
+      "signature": "Two sequences that should have the same length are zipped without checking, so a mismatch silently truncates to the shorter one.",
+      "severity": "trap",
+      "category": "correctness",
+      "topic": "control-flow",
+      "tags": [
+        "iterators",
+        "truncation",
+        "silent-failure"
+      ],
+      "keywords": [
+        ".zip(",
+        "iter().zip(",
+        "std::iter::zip(",
+        "izip!("
+      ],
+      "language": "rust"
     },
     {
       "id": "zip-without-strict",
@@ -1617,7 +5040,8 @@
         "for x, y in zip",
         "strict=True",
         "zip(inputs, targets)"
-      ]
+      ],
+      "language": "python"
     }
   ]
 }

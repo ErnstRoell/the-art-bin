@@ -10,6 +10,7 @@ category: adr
 related:
   - docs/001-system-overview.md
   - docs/adr/011-architecture-group-with-a-larger-ceiling.md
+  - docs/adr/012-rust-as-a-second-language.md
 ---
 
 # Monorepo With A Language-Scoped Corpus
@@ -36,9 +37,9 @@ later inserted a group directory below the language, leaving the language-scopin
 - Schema changes are atomic: "add a field" and "teach the server the field" are one commit. This matters most
   now, while the schema is still moving, and matters less as it settles.
 - A contributor adding one markdown file sees server code and a `pyproject.toml` they have no reason to touch.
-  Acceptable friction; `CONTRIBUTING.md` should point straight at `snippets/python/` and `TEMPLATE.md`.
+  Acceptable friction; `CONTRIBUTING.md` should point straight at `snippets/<language>/` and `TEMPLATE.md`.
 - Adding a second language is a new directory, not a migration of every path. One directory of cost today buys
-  that.
+  that. ([ADR 012](./012-rust-as-a-second-language.md) later added Rust this way.)
 - The `language` field is redundant with the path. Kept deliberately, so an extracted or transmitted record
   remains complete.
 - If contributor volume ever justifies a pure data repository, splitting the corpus out is the graduation path,

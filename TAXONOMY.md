@@ -1,7 +1,7 @@
 # Taxonomy
 
 The two closed lists every smell is filed against. `category` says what a smell costs you; `topic` says which
-part of Python it lives in. Both are validated, so a value not listed here fails CI.
+part of the language it lives in. Both are validated, so a value not listed here fails CI.
 
 Adding a value is a deliberate change to this file, not something done in passing. Before adding one, check that
 no existing value fits — a taxonomy that grows per contribution stops being able to answer questions.
@@ -21,11 +21,11 @@ There is deliberately no `style` category. That axis is carried by `severity: ta
 
 ## Topic
 
-Which Python feature the smell lives in. Exactly one per smell.
+Which language feature the smell lives in. Exactly one per smell.
 
-- `exceptions` — raising, catching, and error propagation
+- `exceptions` — raising, catching, error propagation, and fallible flows
 - `mutability` — shared mutable state, aliasing, in-place modification
-- `typing` — annotations, type checking, protocols
+- `typing` — annotations, type checking, traits, protocols
 - `naming` — identifier choice
 - `functions` — signatures, parameters, return values, scope
 - `classes` — class design, inheritance, attributes, methods

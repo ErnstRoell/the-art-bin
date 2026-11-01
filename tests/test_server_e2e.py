@@ -84,3 +84,23 @@ async def test_hallucinated_id_does_not_fail_the_call() -> None:
         )
         assert len(result["smells"]) == 1
         assert result["unknown"] == ["not-a-real-smell"]
+
+
+async def test_language_filter_over_the_wire() -> None:
+    async with connect() as client:
+        rust_catalog = payload(await client.call_tool("list_smells", {"language": "rust"}))
+        assert rust_catalog["count"] > 0
+        assert all(s["language"] == "rust" for s in rust_catalog["smells"])
+
+        py_catalog = payload(await client.call_tool("list_smells", {"language": "python"}))
+        assert py_catalog["count"] > 0
+        assert all(s["language"] == "python" for s in py_catalog["smells"])
+
+        ts_catalog = payload(await client.call_tool("list_smells", {"language": "typescript"}))
+        assert ts_catalog["count"] > 0
+        assert all(s["language"] == "typescript" for s in ts_catalog["smells"])
+
+        rust_smell = rust_catalog["smells"][0]["id"]
+        records = payload(await client.call_tool("get_smells", {"ids": [rust_smell]}))
+        assert records["smells"][0]["language"] == "rust"
+        assert records["unknown"] == []

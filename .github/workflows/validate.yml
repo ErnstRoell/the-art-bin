@@ -11,6 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
+      - uses: dtolnay/rust-toolchain@stable  # rustc parses the Rust snippets
+      - run: npm install -g typescript@5  # tsc's parser checks the TypeScript snippets
       - name: Validate corpus and catalog freshness
         run: uv run validate.py
 
@@ -19,5 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
+      - uses: dtolnay/rust-toolchain@stable  # the validator tests call rustc
+      - run: npm install -g typescript@5  # and tsc's parser
       - name: Test the MCP server
         run: uv run pytest -q

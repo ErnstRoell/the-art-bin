@@ -40,6 +40,8 @@ RECORD_FIELDS = (
     "keywords",
     "language",
     "python",
+    "rust",
+    "typescript",
     "added",
     "source",
 )
@@ -149,7 +151,7 @@ def parse_record(path: Path) -> dict[str, Any]:
 
 
 def _matches_version(spec: str | None, version: str) -> bool:
-    """True when ``version`` satisfies a smell's ``python`` range. Unparseable ranges match."""
+    """True when ``version`` satisfies a smell's version range. Unparseable ranges match."""
     if not spec:
         return True
     try:
@@ -224,15 +226,15 @@ class Corpus:
         severity: list[str] | None = None,
         category: list[str] | None = None,
         topic: list[str] | None = None,
-        language: str = "python",
+        language: str | None = None,
         python_version: str | None = None,
+        rust_version: str | None = None,
+        typescript_version: str | None = None,
     ) -> dict[str, Any]:
         catalog = self.catalog()
         smells = catalog.get("smells", [])
-        languages = catalog.get("language")
-        languages = [languages] if isinstance(languages, str) else list(languages or [])
-        if language and languages and language not in languages:
-            smells = []
+        if language:
+            smells = [smell for smell in smells if smell.get("language") == language]
 
         wanted = {"severity": severity, "category": category, "topic": topic}
         for field, values in wanted.items():
@@ -240,11 +242,17 @@ class Corpus:
                 allowed = set(values)
                 smells = [smell for smell in smells if smell.get(field) in allowed]
 
-        if python_version:
+        # A version names one language, so giving any restricts the catalog to the languages
+        # that have one; each smell is then checked against its own language's range.
+        versions = {"python": python_version, "rust": rust_version, "typescript": typescript_version}
+        if any(versions.values()):
             keep = []
             for smell in smells:
+                lang = smell.get("language")
+                if not (version := versions.get(lang)):
+                    continue
                 record = self.record(smell["id"])
-                if _matches_version(record.get("python") if record else None, python_version):
+                if _matches_version(record.get(lang) if record else None, version):
                     keep.append(smell)
             smells = keep
 

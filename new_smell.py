@@ -33,11 +33,22 @@ from pathlib import Path
 
 import yaml
 
-from validate import FRONTMATTER_RE, SEVERITIES, SLUG_RE, SNIPPETS, SNIPPET_LINES, load_taxonomy
+from validate import (
+    FENCE_RE,
+    FRONTMATTER_RE,
+    LANGUAGES,
+    SEVERITIES,
+    SLUG_RE,
+    SNIPPETS,
+    SNIPPET_LINES,
+    load_taxonomy,
+)
 
 ROOT = Path(__file__).parent
 TEMPLATE = ROOT / "TEMPLATE.md"
 DEFAULT_LANGUAGE = "python"
+# Per language: the comment prefix for the placeholder code, and the default version range.
+SCAFFOLD = {"python": ("#", ">=3.0"), "rust": ("//", ">=1.0"), "typescript": ("//", ">=3.0")}
 H1_RE = re.compile(r"^# .+$", re.MULTILINE)
 
 # Words too common to say anything about whether two slugs describe the same smell.
@@ -146,6 +157,15 @@ def fill_template(template: str, values: dict[str, str], title: str) -> str:
     loses every one of them. A value of "" drops the key, which is how an optional field
     goes away.
     """
+    # TEMPLATE.md is written in Python; carry its version field and code fences across.
+    language = values["language"]
+    comment, floor = SCAFFOLD[language]
+    template = re.sub(r"^python: .*$", f'{language}: "{floor}"', template, count=1, flags=re.MULTILINE)
+    template = FENCE_RE.sub(
+        lambda fence: f"```{language}\n" + re.sub(r"^#", comment, fence.group(2), flags=re.MULTILINE) + "```",
+        template,
+    )
+
     match = FRONTMATTER_RE.match(template)
     if not match:
         sys.exit("error: TEMPLATE.md has no YAML frontmatter")
@@ -179,7 +199,9 @@ def main() -> int:
     parser.add_argument("--category", help="a value listed under ## Category in TAXONOMY.md")
     parser.add_argument("--topic", help="a value listed under ## Topic in TAXONOMY.md")
     parser.add_argument("--title", help="H1 title (default: the slug, de-hyphenated)")
-    parser.add_argument("--language", default=DEFAULT_LANGUAGE, help="corpus language (default: python)")
+    parser.add_argument(
+        "--language", choices=LANGUAGES, default=DEFAULT_LANGUAGE, help="corpus language (default: python)"
+    )
     parser.add_argument("--source", help="contributor credit (default: git config user.name)")
     parser.add_argument("--force", action="store_true", help="overwrite an existing file")
     parser.add_argument("--edit", action="store_true", help="open the new file in $EDITOR")
